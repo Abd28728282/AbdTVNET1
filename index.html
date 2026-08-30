@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحميل تطبيق Abd TV</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0b1120 0%, #17153a 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* زيادة المسافات العلوية والسفلية لجعل الصفحة أطول في التصفح */
+            padding: 60px 20px;
+        }
+
+        /* حاوية البطاقة الرئيسية - محسنة للهواتف */
+        .container {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 28px;
+            /* زيادة الارتفاع الداخلي (Padding) لجعل الصفحة أطول */
+            padding: 50px 25px;
+            max-width: 420px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        /* أيقونة التطبيق */
+        .app-icon {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, #2563eb, #3b82f6);
+            border-radius: 26px;
+            margin: 0 auto 25px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .app-icon i {
+            font-size: 55px;
+            color: #ffffff;
+        }
+
+        /* العنوان */
+        h1 {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(to right, #60a5fa, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 14px;
+            color: #94a3b8;
+            margin-bottom: 30px;
+        }
+
+        /* قسم "عن التطبيق" */
+        .about-section {
+            background: rgba(15, 23, 42, 0.6);
+            border-radius: 20px;
+            padding: 25px 20px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            text-align: right;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .about-section h2 {
+            font-size: 17px;
+            color: #60a5fa;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .about-section p {
+            font-size: 15px;
+            line-height: 1.8;
+            color: #cbd5e1;
+        }
+
+        /* قسم مميزات التطبيق لإطالة الصفحة بشكل مظهر جذاب */
+        .features-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 35px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            text-align: right;
+        }
+
+        .feature-card i {
+            font-size: 22px;
+            color: #3b82f6;
+            background: rgba(59, 130, 246, 0.15);
+            padding: 12px;
+            border-radius: 12px;
+        }
+
+        .feature-card div h3 {
+            font-size: 15px;
+            color: #f8fafc;
+        }
+
+        .feature-card div p {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+
+        /* إطار الحاوية الأزرق للزر (Blue Box Wrapper) */
+        .blue-btn-wrapper {
+            background: rgba(37, 99, 235, 0.1);
+            border: 2px solid #2563eb;
+            border-radius: 20px;
+            padding: 12px;
+            box-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
+            transition: all 0.3s ease;
+        }
+
+        .blue-btn-wrapper:hover {
+            box-shadow: 0 0 30px rgba(37, 99, 235, 0.6);
+            border-color: #60a5fa;
+        }
+
+        /* زر التحميل */
+        .download-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
+            color: #ffffff;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 700;
+            border-radius: 14px;
+            box-shadow: 0 8px 20px rgba(29, 78, 216, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .download-btn:active {
+            transform: scale(0.98);
+        }
+
+        /* انيميشن الحركات */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="app-icon">
+            <i class="fa-solid fa-tv"></i>
+        </div>
+
+        <h1>Abd TV</h1>
+        <p class="tagline">الإصدار الرسمى v1.0 للأندرويد</p>
+
+        <div class="about-section">
+            <h2><i class="fa-solid fa-circle-info"></i> عن التطبيق</h2>
+            <p>هو تطبيق لمشاهده القنوات على الهاتف مجانا وبدون اعلانات. يوفر لك تجربة فريدة لبث القنوات التلفزيونية بجودة عالية وسرعة ممتازة على أجهزة الأندرويد.</p>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <i class="fa-solid fa-ban"></i>
+                <div>
+                    <h3>بدون إعلانات</h3>
+                    <p>مشاهدة صافية ومستمرة بدون أي إزعاج</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <i class="fa-solid fa-bolt"></i>
+                <div>
+                    <h3>سريع وسلس</h3>
+                    <p>يعمل بكفاءة عالية على جميع أنواع الهواتف</p>
+                </div>
+            </div>
+
+            <div class="feature-card">
+                <i class="fa-solid fa-hand-holding-dollar"></i>
+                <div>
+                    <h3>مجاني بالكامل</h3>
+                    <p>لا يتطلب أي اشتراكات أو رسوم شهريّة</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="blue-btn-wrapper">
+            <a href="https://raw.githubusercontent.com/abdalhayhrob1166-collab/Abd-TV/main/Abd%20TV_1.0.apk" class="download-btn" download>
+                <i class="fa-solid fa-file-arrow-down"></i>
+                تحميل التطبيق APK
+            </a>
+        </div>
+    </div>
+
+</body>
+</html>
