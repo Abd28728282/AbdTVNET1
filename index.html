@@ -3,238 +3,403 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تحميل تطبيق Abd TV</title>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <title>منصة البث المباشر | المطور عبد الحي</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: #1e293b;
+            --accent-color: #6366f1;
+            --text-color: #f8fafc;
+            --text-muted: #94a3b8;
+        }
+
+        *, *::before, *::after {
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            outline: none !important;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background: linear-gradient(135deg, #0b1120 0%, #17153a 100%);
-            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             min-height: 100vh;
             display: flex;
-            justify-content: center;
-            align-items: center;
-            /* زيادة المسافات العلوية والسفلية لجعل الصفحة أطول في التصفح */
-            padding: 60px 20px;
+            flex-direction: column;
         }
 
-        /* حاوية البطاقة الرئيسية - محسنة للهواتف */
-        .container {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 28px;
-            /* زيادة الارتفاع الداخلي (Padding) لجعل الصفحة أطول */
-            padding: 50px 25px;
-            max-width: 420px;
-            width: 100%;
+        header {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            padding: 15px;
             text-align: center;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-            animation: fadeIn 0.8s ease-in-out;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            border-bottom: 2px solid var(--accent-color);
         }
 
-        /* أيقونة التطبيق */
-        .app-icon {
-            width: 110px;
-            height: 110px;
-            background: linear-gradient(135deg, #2563eb, #3b82f6);
-            border-radius: 26px;
-            margin: 0 auto 25px auto;
+        header h1 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 900;
+        }
+
+        .developer-badge {
+            display: inline-block;
+            background: rgba(99, 102, 241, 0.2);
+            border: 1px solid var(--accent-color);
+            color: #a5b4fc;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+
+        .main-container {
             display: flex;
+            flex-direction: column;
+            max-width: 1400px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            gap: 15px;
+            flex: 1;
+        }
+
+        @media (min-width: 992px) {
+            .main-container { flex-direction: row; }
+        }
+
+        .player-section {
+            flex: 2;
+            background: #000;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 15px;
+            height: fit-content;
+        }
+
+        .media-container {
+            position: relative;
+            padding-top: 56.25%;
+            background: #000;
+            width: 100%;
+        }
+
+        video, iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+            object-fit: contain;
+        }
+
+        .web-fallback {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 12px 30px rgba(37, 99, 235, 0.4);
-            animation: float 3s ease-in-out infinite;
+            background: #111827;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            gap: 15px;
         }
 
-        .app-icon i {
-            font-size: 55px;
-            color: #ffffff;
+        .external-btn {
+            background: var(--accent-color);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: 0.2s;
         }
 
-        /* العنوان */
-        h1 {
-            font-size: 30px;
-            font-weight: 800;
-            margin-bottom: 8px;
-            background: linear-gradient(to right, #60a5fa, #93c5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .tagline {
-            font-size: 14px;
-            color: #94a3b8;
-            margin-bottom: 30px;
-        }
-
-        /* قسم "عن التطبيق" */
-        .about-section {
-            background: rgba(15, 23, 42, 0.6);
-            border-radius: 20px;
-            padding: 25px 20px;
-            margin-bottom: 30px;
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            text-align: right;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        .about-section h2 {
-            font-size: 17px;
-            color: #60a5fa;
-            margin-bottom: 12px;
+        .current-info {
+            padding: 12px 18px;
+            background: var(--card-bg);
+            border-top: 1px solid rgba(255,255,255,0.05);
             display: flex;
             align-items: center;
+            justify-content: space-between;
+        }
+
+        .info-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .current-info img {
+            width: 45px;
+            height: 45px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .fullscreen-btn {
+            background: var(--accent-color);
+            color: #fff;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+
+        .channels-section {
+            flex: 1;
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 15px;
+            max-height: 78vh;
+            overflow-y: auto;
+        }
+
+        .channels-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
             gap: 10px;
         }
 
-        .about-section p {
-            font-size: 15px;
-            line-height: 1.8;
-            color: #cbd5e1;
-        }
-
-        /* قسم مميزات التطبيق لإطالة الصفحة بشكل مظهر جذاب */
-        .features-grid {
+        .channel-card {
+            background: #0f172a;
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: 8px;
+            text-align: center;
+            cursor: pointer;
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            margin-bottom: 35px;
-        }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 16px;
-            display: flex;
             align-items: center;
-            gap: 15px;
-            text-align: right;
+            gap: 6px;
         }
 
-        .feature-card i {
-            font-size: 22px;
-            color: #3b82f6;
-            background: rgba(59, 130, 246, 0.15);
-            padding: 12px;
-            border-radius: 12px;
+        .channel-card.active {
+            border-color: var(--accent-color);
+            background: linear-gradient(145deg, #312e81, #1e1b4b);
         }
 
-        .feature-card div h3 {
-            font-size: 15px;
-            color: #f8fafc;
-        }
-
-        .feature-card div p {
-            font-size: 12px;
-            color: #94a3b8;
-        }
-
-        /* إطار الحاوية الأزرق للزر (Blue Box Wrapper) */
-        .blue-btn-wrapper {
-            background: rgba(37, 99, 235, 0.1);
-            border: 2px solid #2563eb;
-            border-radius: 20px;
-            padding: 12px;
-            box-shadow: 0 0 20px rgba(37, 99, 235, 0.35);
-            transition: all 0.3s ease;
-        }
-
-        .blue-btn-wrapper:hover {
-            box-shadow: 0 0 30px rgba(37, 99, 235, 0.6);
-            border-color: #60a5fa;
-        }
-
-        /* زر التحميل */
-        .download-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
+        .channel-card img {
             width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 100%);
-            color: #ffffff;
-            text-decoration: none;
-            font-size: 18px;
+            height: 60px;
+            object-fit: contain;
+        }
+
+        .channel-card span {
+            font-size: 0.8rem;
             font-weight: 700;
-            border-radius: 14px;
-            box-shadow: 0 8px 20px rgba(29, 78, 216, 0.4);
-            transition: all 0.3s ease;
         }
 
-        .download-btn:active {
-            transform: scale(0.98);
-        }
-
-        /* انيميشن الحركات */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-8px); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        footer {
+            text-align: center;
+            padding: 12px;
+            background: #090d16;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
 
-    <div class="container">
-        <div class="app-icon">
-            <i class="fa-solid fa-tv"></i>
-        </div>
+    <header>
+        <h1>تلفزيون البث المباشر</h1>
+        <div class="developer-badge">تطوير: المطور عبد الحي</div>
+    </header>
 
-        <h1>Abd TV</h1>
-        <p class="tagline">الإصدار الرسمى v1.0 للأندرويد</p>
-
-        <div class="about-section">
-            <h2><i class="fa-solid fa-circle-info"></i> عن التطبيق</h2>
-            <p>هو تطبيق لمشاهده القنوات على الهاتف مجانا وبدون اعلانات. يوفر لك تجربة فريدة لبث القنوات التلفزيونية بجودة عالية وسرعة ممتازة على أجهزة الأندرويد.</p>
-        </div>
-
-        <div class="features-grid">
-            <div class="feature-card">
-                <i class="fa-solid fa-ban"></i>
-                <div>
-                    <h3>بدون إعلانات</h3>
-                    <p>مشاهدة صافية ومستمرة بدون أي إزعاج</p>
+    <div class="main-container">
+        <div class="player-section">
+            <div class="media-container" id="media-container">
+                <video id="video" controls autoplay></video>
+                <iframe id="webview" style="display: none;" allowfullscreen></iframe>
+                <div id="fallback" class="web-fallback" style="display: none;">
+                    <p>هذه القناة تتطلب الفتح في نافذة خارجية نظراً لسياسة الحماية الخاصة بها</p>
+                    <a id="external-link" href="#" target="_blank" class="external-btn">فتح القناة في نافذة جديدة ↗</a>
                 </div>
             </div>
-
-            <div class="feature-card">
-                <i class="fa-solid fa-bolt"></i>
-                <div>
-                    <h3>سريع وسلس</h3>
-                    <p>يعمل بكفاءة عالية على جميع أنواع الهواتف</p>
+            <div class="current-info">
+                <div class="info-details">
+                    <img id="current-img" src="" alt="" style="display: none;">
+                    <h3 id="current-title" style="margin:0;">اختر قناة لبدء العرض</h3>
                 </div>
-            </div>
-
-            <div class="feature-card">
-                <i class="fa-solid fa-hand-holding-dollar"></i>
-                <div>
-                    <h3>مجاني بالكامل</h3>
-                    <p>لا يتطلب أي اشتراكات أو رسوم شهريّة</p>
-                </div>
+                <button class="fullscreen-btn" onclick="toggleFullScreen()">عرض أفقي كامل ⛶</button>
             </div>
         </div>
 
-        <div class="blue-btn-wrapper">
-            <a href="https://raw.githubusercontent.com/abdalhayhrob1166-collab/Abd-TV/main/Abd%20TV_1.0.apk" class="download-btn" download>
-                <i class="fa-solid fa-file-arrow-down"></i>
-                تحميل التطبيق APK
-            </a>
+        <div class="channels-section">
+            <div class="channels-grid" id="channels-list"></div>
         </div>
     </div>
 
+    <footer>
+        جميع الحقوق محفوظة &copy; 2026 | تطوير المطور عبد الحي
+    </footer>
+
+    <script>
+        const channels = [
+            { id: 1, name: "MBC 3 EUR", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
+            { id: 2, name: "فلسطين اليوم", logo: "https://i.ibb.co/ddsMBs7/image.jpg", url: "https://live.paltodaytv.com/paltv/live/playlist_sfm4s.m3u8" },
+            { id: 3, name: "روسيا اليوم", logo: "https://i.ibb.co/Jjk2k8qY/image.png", url: "https://rt-arb.rttv.com/dvr/rtarab/playlist_800Kb.m3u8" },
+            { id: 4, name: "الحدث", logo: "https://i.ibb.co/Nd33d9rK/image.png", url: "https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8" },
+            { id: 5, name: "فلسطين التعليمية", logo: "https://i.ibb.co/ZzNXG3DD/image.png", url: "https://pbc.furrera.ps/PalestineEDU/index.m3u8" },
+            { id: 6, name: "قناة الأقصى", logo: "https://i.ibb.co/pvfGqbjd/image.jpg", url: "https://43869de4e1a0d641.servers.dvcloud.tv/hls/al_aqsa_channel/6udfi7v8a3eof6nlps6e9ovfrs65c7l7.m3u8" },
+            { id: 7, name: "الجزيرة", logo: "https://i.ibb.co/VYyJQV52/image.jpg", url: "https://live-hls-web-aja.getaj.net/AJA/01.m3u8" },
+            { id: 8, name: "إذاعة القرآن الكريم مباشر", logo: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=600&auto=format&fit=crop", url: "https://Abd28728282.github.io/-/" },
+            { id: 9, name: "فلسطين", logo: "https://iili.io/CDpqvqX.png", url: "http://pbc.furrera.ps/palestinehd/index.m3u8" },
+            { id: 10, name: "فلسطين مباشر", logo: "https://iili.io/CDpu81p.webp", url: "http://pbc.furrera.ps/palestinelivehd/index.m3u8" },
+            { id: 11, name: "قناة مساواة", logo: "https://iili.io/CDp0W2j.webp", url: "http://pbc.furrera.ps/musawahd/index.m3u8" },
+            { id: 12, name: "العربية", logo: "https://i.ibb.co/3VFfw2Z/image.jpg", url: "https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8" },
+            { id: 13, name: "التلفزيون العربي", logo: "https://i.ibb.co/m5gxf7jM/image.jpg", url: "https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70" },
+            { id: 14, name: "الميادين", logo: "https://iili.io/CbBixNp.png", url: "https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8" },
+            { id: 15, name: "MBC MASR", logo: "https://i.ibb.co/4wsSd07j/image.png", url: "https://shd-gcp-live.lg.mncdn.com/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8" },
+            { id: 16, name: "MBC 1", logo: "https://iili.io/CbiU7Eb.png", url: "https://shd-gcp-live-orng.shahid.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c503a296dd0d8/index.m3u8" },
+            { id: 17, name: "MBC 5", logo: "https://i.ibb.co/6R4kp81h/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8" },
+            { id: 18, name: "MBC 4", logo: "https://i.ibb.co/PGzB80dQ/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-4/24f134f1cd63db9346439e96b86ca6ed/index.m3u8" },
+            { id: 19, name: "MBC Drama", logo: "https://i.ibb.co/G4s3njSJ/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-plus-drama/e37251ec2aac8f6c98f75cd0fa37cd28/index.m3u8" },
+            { id: 20, name: "قناة معاً", logo: "https://i.ibb.co/rK71WBs0/image.png", url: "https://htvmada.mada.ps:4443/maannews/index.m3u8" },
+            { id: 21, name: "الجزيرة مباشر", logo: "https://i.ibb.co/chHwWxTG/image.png", url: "https://live-hls-web-ajm.getaj.net/AJM/03.m3u8" },
+            { id: 22, name: "سکای نیوز عربية", logo: "https://i.ibb.co/dXtnXjn/image.png", url: "https://live-stream.skynewsarabia.com/c-horizontal-channel/horizontal-stream/index.m3u8" },
+            { id: 23, name: "قناة القرآن", logo: "https://i.ibb.co/83dJqY0/image.jpg", url: "http://m.live.net.sa:1935/live/quran/playlist.m3u8" },
+            { id: 24, name: "سبيستون", logo: "https://i.ibb.co/yn451C7Y/image.png", url: "https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8" },
+            { id: 25, name: "ام بي سي بوليود", logo: "https://i.ibb.co/xScL6tL5/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-bollywood/546eb40d7dcf9a209255dd2496903764/index.m3u8" },
+            { id: 26, name: "رؤيا طبخ", logo: "https://i.ibb.co/G4xjFPHY/image.png", url: "https://fast.kwikmotion.com/roya/kitchen/playlist.m3u8" },
+            { id: 27, name: "رؤيا كوميديا", logo: "https://i.ibb.co/fY0CRQ5F/image.png", url: "https://fast.kwikmotion.com/roya/comedy/playlist.m3u8" },
+            { id: 28, name: "MBC 2", logo: "https://i.ibb.co/ymtHsm66/image.png", url: "https://play.arab-stream.live/p/mbc-2-live.html?m=1" },
+            { id: 29, name: "CNBC عربية", logo: "https://i.ibb.co/XxGZP9mj/image.png", url: "https://cnbc-live.akamaized.net/cnbc/master.m3u8" },
+            { id: 30, name: "ام بي سي دراما", logo: "https://i.ibb.co/XfTDzYDG/image.png", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-drama/2c28a458e2f3253e678b07ac7d13fe71/index.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&video_codec=H264" },
+            { id: 31, name: "قناه السنة النبوية", logo: "https://i.ibb.co/d49q0zFj/image.png", url: "http://m.live.net.sa:1935/live/sunnah/playlist.m3u8" },
+            { id: 32, name: "إقرأ", logo: "https://i.ibb.co/bg169SnS/image.png", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-iqraa/71b9601f8a91d79a78a02f86ae378d88/index.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&video_codec=H264" },
+            { id: 33, name: "القران الكريم السديس", logo: "https://i.ibb.co/8LmdFwBq/image.png", url: "https://shd-amg-fast.edgenextcdn.net/tx016/1080p-d/index.m3u8" },
+            { id: 34, name: "باب الحارة", logo: "https://i.ibb.co/Z1zQt11w/image.png", url: "https://shd-amg-fast.edgenextcdn.net/tx010/1080p-d/index.m3u8" },
+            { id: 35, name: "قناة الفجر", logo: "https://i.ibb.co/TqwZvCGH/image.png", url: "https://e2.alfajertv.com/hls/ftv1_720p/index.m3u8?md5=u_PlgPIoJuMTeqX7fYHoGA&expires=1788088453" },
+            { id: 36, name: "العربي ٢", logo: "https://i.ibb.co/QjrjydCt/image.jpg", url: "https://live.kwikmotion.com/alaraby2live/alaraby2.smil/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70&position=50&align=center" },
+            { id: 37, name: "CARTOON NETWORK HD", logo: "https://i.ibb.co/nq8kvNHw/image.png", url: "http://azrogo.com/m3u8/artv/live/playlist.m3u8?token=xseNBF6DJear2MsTkwFVtDlLblNCYUF3dWZkdnpuMmNnM0ltSFE9PQ==" },
+            { id: 38, name: "كرتون نتورك", logo: "https://i.ibb.co/qMKMyrwR/image.png", url: "https://www.web24iptv.online/pl/m?ch=cn_ar4" },
+            { id: 39, name: "MBC 3 الاحتياطي", logo: "https://i.ibb.co/438MF2v/image.png", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
+            { id: 40, name: "ماجد", logo: "https://i.ibb.co/KjBC4WrR/image.png", url: "https://www.web24iptv.online/pl/m?ch=majed" },
+            { id: 41, name: "ناشيونال جرافيك أبو ظبي", logo: "https://i.ibb.co/zWq8vNG2/image.png", url: "https://www.web24iptv.online/pl/m?ch=NatGeo_AbuDhabi_HD" },
+            { id: 42, name: "إم بي سي أكشن", logo: "https://i.ibb.co/27gwPQRh/image.png", url: "https://www.web24iptv.online/pl/m?ch=mbca11" },
+            { id: 43, name: "فيلم جوتزيلا", logo: "https://i.ibb.co/CK8P7Rv3/image.jpg", url: "https://archive.org/serve/turner_video_2368/2368.mp4" },
+            { id: 44, name: "Godzilla Minus One", logo: "https://i.ibb.co/7x98nZBk/image.png", url: "https://zenithianzephyr.space/pl/H4sIAAAAAAAAAwXB2XKDIBQA0F8Cl1g7kxerkHGNChfnvqnQWCFN0nQZ_fqeQ6OIaKIjrafDYTyQ2ATzZEhEIj805j14nYQTJk1uCPPe8O9acEsxrXO0eVIQ2su0tqiYUJ.OdMT9iJX5CpZ9su5R2Weg.IKju_0qSaX2Mg8GqJoszCuia.EngRrsl3LL29zHUuyuaa.00KoNkcug2l62lsAJhqRVdiklYw_0KB8tvQNjYoRsr3y7T6vzZ7qUJdGIvN76Pv5o18sfpnlgAFY5sAx3rHG4g7m6c5N1z8J3jYLL1gnAc3s8_gMwoe2NCQEAAA--/master.m3u8?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJteS1hdXRoIiwiaWF0IjoxNzg4MjU5NTA4LCJuYmYiOjE3ODgyNTk1MDgsImV4cCI6MTc4ODI3MzkwOCwiaXBfY2lkciI6IjJhMTM6NTRjMjpmMDAwOjRiNzM6Oi82NCJ9.el9hQvDJ-Sv3h3dGIkIQmp-vIMYsvvjk3Rp-ehC6bhU" }
+        ];
+
+        const video = document.getElementById('video');
+        const webview = document.getElementById('webview');
+        const fallback = document.getElementById('fallback');
+        const externalLink = document.getElementById('external-link');
+        const mediaContainer = document.getElementById('media-container');
+        const channelsList = document.getElementById('channels-list');
+        const currentImg = document.getElementById('current-img');
+        const currentTitle = document.getElementById('current-title');
+        let hls = new Hls();
+
+        function loadChannel(channel) {
+            currentTitle.textContent = channel.name;
+            currentImg.src = channel.logo;
+            currentImg.style.display = 'block';
+
+            document.querySelectorAll('.channel-card').forEach(card => card.classList.remove('active'));
+            document.getElementById(`channel-${channel.id}`).classList.add('active');
+
+            const isDirectMedia = channel.url.includes('.m3u8') || channel.url.includes('.mp4');
+
+            // إعادة ضبط العرض
+            webview.style.display = 'none';
+            fallback.style.display = 'none';
+            video.style.display = 'none';
+
+            if (isDirectMedia) {
+                video.style.display = 'block';
+                if (channel.url.includes('.mp4')) {
+                    if (Hls.isSupported()) hls.detachMedia();
+                    video.src = channel.url;
+                    video.play();
+                } else if (Hls.isSupported()) {
+                    hls.destroy();
+                    hls = new Hls();
+                    hls.loadSource(channel.url);
+                    hls.attachMedia(video);
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = channel.url;
+                    video.addEventListener('loadedmetadata', () => video.play());
+                }
+            } else {
+                // التعامل مع صفحات الويب التي قد تمنع التضمين وتسبب الشاشة السوداء
+                if (Hls.isSupported()) hls.detachMedia();
+                video.pause();
+
+                webview.style.display = 'block';
+                webview.src = channel.url;
+
+                // توفير زر بديل في حال محاصرة الصفحة وحظرها
+                externalLink.href = channel.url;
+                
+                // إظهار الخيار البديل تلقائياً للمواقع الشهيرة بالحظر مثل MBC 2
+                if(channel.url.includes('arab-stream') || channel.url.includes('web24iptv')) {
+                    webview.style.display = 'none';
+                    fallback.style.display = 'flex';
+                }
+            }
+        }
+
+        // تفعيل الشاشة الكاملة بالوضع الأفقي
+        async function toggleFullScreen() {
+            try {
+                if (!document.fullscreenElement) {
+                    if (mediaContainer.requestFullscreen) {
+                        await mediaContainer.requestFullscreen();
+                    } else if (mediaContainer.webkitRequestFullscreen) {
+                        await mediaContainer.webkitRequestFullscreen();
+                    }
+
+                    // قفل الاتجاه بالوضع الأفقي للجوالات
+                    if (screen.orientation && screen.orientation.lock) {
+                        await screen.orientation.lock('landscape').catch(() => {});
+                    }
+                } else {
+                    if (document.exitFullscreen) {
+                        await document.exitFullscreen();
+                    }
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    }
+                }
+            } catch (err) {
+                console.log(err);
+            }
+        }
+
+        channels.forEach(channel => {
+            const card = document.createElement('div');
+            card.className = 'channel-card';
+            card.id = `channel-${channel.id}`;
+            card.innerHTML = `
+                <img src="${channel.logo}" alt="${channel.name}" onerror="this.src='https://via.placeholder.com/150?text=TV'">
+                <span>${channel.name}</span>
+            `;
+            card.onclick = () => loadChannel(channel);
+            channelsList.appendChild(card);
+        });
+
+        if(channels.length > 0) loadChannel(channels[0]);
+    </script>
 </body>
 </html>
