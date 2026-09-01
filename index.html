@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة البث المباشر | المطور عبد الحي</title>
-    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -254,6 +253,7 @@
     </footer>
 
     <script>
+        // الروابط المحدثة لتعمل عبر بروتوكولات HTTPS الرسمية والقابلة للتشغيل بشكل آمن
         const channels = [
             { id: 1, name: "MBC 3 EUR", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
             { id: 2, name: "فلسطين اليوم", logo: "https://i.ibb.co/ddsMBs7/image.jpg", url: "https://live.paltodaytv.com/paltv/live/playlist_sfm4s.m3u8" },
@@ -263,9 +263,9 @@
             { id: 6, name: "قناة الأقصى", logo: "https://i.ibb.co/pvfGqbjd/image.jpg", url: "https://43869de4e1a0d641.servers.dvcloud.tv/hls/al_aqsa_channel/6udfi7v8a3eof6nlps6e9ovfrs65c7l7.m3u8" },
             { id: 7, name: "الجزيرة", logo: "https://i.ibb.co/VYyJQV52/image.jpg", url: "https://live-hls-web-aja.getaj.net/AJA/01.m3u8" },
             { id: 8, name: "إذاعة القرآن الكريم مباشر", logo: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=600&auto=format&fit=crop", url: "https://Abd28728282.github.io/-/" },
-            { id: 9, name: "فلسطين", logo: "https://iili.io/CDpqvqX.png", url: "http://pbc.furrera.ps/palestinehd/index.m3u8" },
-            { id: 10, name: "فلسطين مباشر", logo: "https://iili.io/CDpu81p.webp", url: "http://pbc.furrera.ps/palestinelivehd/index.m3u8" },
-            { id: 11, name: "قناة مساواة", logo: "https://iili.io/CDp0W2j.webp", url: "http://pbc.furrera.ps/musawahd/index.m3u8" },
+            { id: 9, name: "فلسطين", logo: "https://iili.io/CDpqvqX.png", url: "https://pbc.furrera.ps/palestinehd/index.m3u8" },
+            { id: 10, name: "فلسطين مباشر", logo: "https://iili.io/CDpu81p.webp", url: "https://pbc.furrera.ps/palestinelivehd/index.m3u8" },
+            { id: 11, name: "قناة مساواة", logo: "https://iili.io/CDp0W2j.webp", url: "https://pbc.furrera.ps/musawahd/index.m3u8" },
             { id: 12, name: "العربية", logo: "https://i.ibb.co/3VFfw2Z/image.jpg", url: "https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8" },
             { id: 13, name: "التلفزيون العربي", logo: "https://i.ibb.co/m5gxf7jM/image.jpg", url: "https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70" },
             { id: 14, name: "الميادين", logo: "https://iili.io/CbBixNp.png", url: "https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8" },
@@ -277,7 +277,7 @@
             { id: 20, name: "قناة معاً", logo: "https://i.ibb.co/rK71WBs0/image.png", url: "https://htvmada.mada.ps:4443/maannews/index.m3u8" },
             { id: 21, name: "الجزيرة مباشر", logo: "https://i.ibb.co/chHwWxTG/image.png", url: "https://live-hls-web-ajm.getaj.net/AJM/03.m3u8" },
             { id: 22, name: "سکای نیوز عربية", logo: "https://i.ibb.co/dXtnXjn/image.png", url: "https://live-stream.skynewsarabia.com/c-horizontal-channel/horizontal-stream/index.m3u8" },
-            { id: 23, name: "قناة القرآن", logo: "https://i.ibb.co/83dJqY0/image.jpg", url: "http://m.live.net.sa:1935/live/quran/playlist.m3u8" },
+            { id: 23, name: "قناة القرآن", logo: "https://i.ibb.co/83dJqY0/image.jpg", url: "https://m.live.net.sa:1935/live/quran/playlist.m3u8" },
             { id: 24, name: "سبيستون", logo: "https://i.ibb.co/yn451C7Y/image.png", url: "https://live-uae-next.spacetoongo.com/ST_MENA_NEXT/hls/r9p2hjipmw2kl.m3u8" },
             { id: 25, name: "ام بي سي بوليود", logo: "https://i.ibb.co/xScL6tL5/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-bollywood/546eb40d7dcf9a209255dd2496903764/index.m3u8" },
             { id: 26, name: "رؤيا طبخ", logo: "https://i.ibb.co/G4xjFPHY/image.png", url: "https://fast.kwikmotion.com/roya/kitchen/playlist.m3u8" },
@@ -285,13 +285,13 @@
             { id: 28, name: "MBC 2", logo: "https://i.ibb.co/ymtHsm66/image.png", url: "https://play.arab-stream.live/p/mbc-2-live.html?m=1" },
             { id: 29, name: "CNBC عربية", logo: "https://i.ibb.co/XxGZP9mj/image.png", url: "https://cnbc-live.akamaized.net/cnbc/master.m3u8" },
             { id: 30, name: "ام بي سي دراما", logo: "https://i.ibb.co/XfTDzYDG/image.png", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-drama/2c28a458e2f3253e678b07ac7d13fe71/index.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&video_codec=H264" },
-            { id: 31, name: "قناه السنة النبوية", logo: "https://i.ibb.co/d49q0zFj/image.png", url: "http://m.live.net.sa:1935/live/sunnah/playlist.m3u8" },
+            { id: 31, name: "قناه السنة النبوية", logo: "https://i.ibb.co/d49q0zFj/image.png", url: "https://m.live.net.sa:1935/live/sunnah/playlist.m3u8" },
             { id: 32, name: "إقرأ", logo: "https://i.ibb.co/bg169SnS/image.png", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-iqraa/71b9601f8a91d79a78a02f86ae378d88/index.m3u8?aws.manifestfilter=video_height:144-720;video_codec:H264&video_height=144-720&video_codec=H264" },
             { id: 33, name: "القران الكريم السديس", logo: "https://i.ibb.co/8LmdFwBq/image.png", url: "https://shd-amg-fast.edgenextcdn.net/tx016/1080p-d/index.m3u8" },
             { id: 34, name: "باب الحارة", logo: "https://i.ibb.co/Z1zQt11w/image.png", url: "https://shd-amg-fast.edgenextcdn.net/tx010/1080p-d/index.m3u8" },
             { id: 35, name: "قناة الفجر", logo: "https://i.ibb.co/TqwZvCGH/image.png", url: "https://e2.alfajertv.com/hls/ftv1_720p/index.m3u8?md5=u_PlgPIoJuMTeqX7fYHoGA&expires=1788088453" },
             { id: 36, name: "العربي ٢", logo: "https://i.ibb.co/QjrjydCt/image.jpg", url: "https://live.kwikmotion.com/alaraby2live/alaraby2.smil/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70&position=50&align=center" },
-            { id: 37, name: "CARTOON NETWORK HD", logo: "https://i.ibb.co/nq8kvNHw/image.png", url: "http://azrogo.com/m3u8/artv/live/playlist.m3u8?token=xseNBF6DJear2MsTkwFVtDlLblNCYUF3dWZkdnpuMmNnM0ltSFE9PQ==" },
+            { id: 37, name: "CARTOON NETWORK HD", logo: "https://i.ibb.co/nq8kvNHw/image.png", url: "https://azrogo.com/m3u8/artv/live/playlist.m3u8?token=xseNBF6DJear2MsTkwFVtDlLblNCYUF3dWZkdnpuMmNnM0ltSFE9PQ==" },
             { id: 38, name: "كرتون نتورك", logo: "https://i.ibb.co/qMKMyrwR/image.png", url: "https://www.web24iptv.online/pl/m?ch=cn_ar4" },
             { id: 39, name: "MBC 3 الاحتياطي", logo: "https://i.ibb.co/438MF2v/image.png", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
             { id: 40, name: "ماجد", logo: "https://i.ibb.co/KjBC4WrR/image.png", url: "https://www.web24iptv.online/pl/m?ch=majed" },
@@ -309,16 +309,7 @@
         const channelsList = document.getElementById('channels-list');
         const currentImg = document.getElementById('current-img');
         const currentTitle = document.getElementById('current-title');
-        let hls = new Hls();
-
-        // دوال معالجة روابط HTTP البروكسي للتوافق مع HTTPS
-        function getSecureUrl(originalUrl) {
-            if (window.location.protocol === 'https:' && originalUrl.startsWith('http://')) {
-                // استخدام بروكسي آمن وموثوق لربط الـ http بشبكة https
-                return 'https://corsproxy.io/?' + encodeURIComponent(originalUrl);
-            }
-            return originalUrl;
-        }
+        let hls = null;
 
         function loadChannel(channel) {
             currentTitle.textContent = channel.name;
@@ -334,31 +325,66 @@
             fallback.style.display = 'none';
             video.style.display = 'none';
 
-            // تحويل الرابط تلقائياً إلى رابط آمن إذا كان ينتهي بـ http وموقعك https
-            const targetUrl = getSecureUrl(channel.url);
-
             if (isDirectMedia) {
                 video.style.display = 'block';
+                
+                // إغلاق أي مشغل Hls قديم لمنع التداخل
+                if (hls) {
+                    hls.destroy();
+                    hls = null;
+                }
+
                 if (channel.url.includes('.mp4')) {
-                    if (Hls.isSupported()) hls.detachMedia();
-                    video.src = targetUrl;
+                    video.src = channel.url;
                     video.play();
                 } else if (Hls.isSupported()) {
-                    hls.destroy();
-                    hls = new Hls();
-                    hls.loadSource(targetUrl);
+                    // إعداد مشغل HLS مع خيارات محايدة تتجاوز حظر طلبات الشريحة الذكية CORS/HTTP
+                    hls = new Hls({
+                        xhrSetup: function (xhr, url) {
+                            // تحويل تلقائي للشرائح ذات الاتصال غير المشفر HTTP إلى HTTPS إذا طُلبت داخل الموقع
+                            if (url.startsWith('http://') && window.location.protocol === 'https:') {
+                                xhr.open('GET', 'https://corsproxy.io/?' + encodeURIComponent(url), true);
+                            }
+                        }
+                    });
+
+                    let streamUrl = channel.url;
+                    if (channel.url.startsWith('http://') && window.location.protocol === 'https:') {
+                        streamUrl = 'https://corsproxy.io/?' + encodeURIComponent(channel.url);
+                    }
+
+                    hls.loadSource(streamUrl);
                     hls.attachMedia(video);
                     hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+                    
+                    // إدارة أخطاء الاتصال الذكية
+                    hls.on(Hls.Events.ERROR, function (event, data) {
+                        if (data.fatal) {
+                            switch (data.type) {
+                                case Hls.ErrorTypes.NETWORK_ERROR:
+                                    hls.startLoad();
+                                    break;
+                                case Hls.ErrorTypes.MEDIA_ERROR:
+                                    hls.recoverMediaError();
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    });
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = targetUrl;
+                    video.src = channel.url;
                     video.addEventListener('loadedmetadata', () => video.play());
                 }
             } else {
-                if (Hls.isSupported()) hls.detachMedia();
+                if (hls) {
+                    hls.destroy();
+                    hls = null;
+                }
                 video.pause();
 
                 webview.style.display = 'block';
-                webview.src = targetUrl;
+                webview.src = channel.url;
 
                 externalLink.href = channel.url;
                 
