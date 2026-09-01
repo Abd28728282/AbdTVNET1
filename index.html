@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة البث المباشر | المطور عبد الحي</title>
 
-    <!-- تضمين مكتبة Video.js مع التنسيقات الخاصة بها -->
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
 
@@ -89,6 +88,7 @@
             height: fit-content;
         }
 
+        /* حاوية الفيديو ودعم الشاشة الكاملة الأفقية */
         .media-container {
             position: relative;
             padding-top: 56.25%;
@@ -96,7 +96,18 @@
             width: 100%;
         }
 
-        /* تعديل لتناسب مشغل Video.js */
+        .media-container:-webkit-full-screen {
+            width: 100vw;
+            height: 100vh;
+            padding-top: 0;
+        }
+
+        .media-container:fullscreen {
+            width: 100vw;
+            height: 100vh;
+            padding-top: 0;
+        }
+
         .video-js, iframe {
             position: absolute;
             top: 0;
@@ -233,10 +244,10 @@
         <div class="player-section">
             <div class="media-container" id="media-container">
                 <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" autoplay></video>
-                <iframe id="webview" style="display: none;" allowfullscreen></iframe>
+                <iframe id="webview" style="display: none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
                 <div id="fallback" class="web-fallback" style="display: none;">
-                    <p>هذه القناة تتطلب الفتح في نافذة خارجية نظراً لسياسة الحماية الخاصة بها</p>
-                    <a id="external-link" href="#" target="_blank" class="external-btn">فتح القناة في نافذة جديدة ↗</a>
+                    <p>هذه القناة محمية بسيرفرات شاهد وتتطلب الفتح المباشر</p>
+                    <a id="external-link" href="#" target="_blank" class="external-btn">شاهد القناة عبر المصدر الرسمي ↗</a>
                 </div>
             </div>
             <div class="current-info">
@@ -258,9 +269,9 @@
     </footer>
 
     <script>
-        // إم بي سي 3 تم تحديث رابطها إلى بث مباشر مستقر متوافق مع Video.js
         const channels = [
-            { id: 1, name: "MBC 3", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
+            // تم تحديث نوع القنوات المحمية لتفتح عبر Embed مخصص أو التوجيه الذكي
+            { id: 1, name: "MBC 3", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shahid.mbc.net/ar/widgets/live-channel/mbc3", isEmbed: true },
             { id: 2, name: "فلسطين اليوم", logo: "https://i.ibb.co/ddsMBs7/image.jpg", url: "https://live.paltodaytv.com/paltv/live/playlist_sfm4s.m3u8" },
             { id: 3, name: "روسيا اليوم", logo: "https://i.ibb.co/Jjk2k8qY/image.png", url: "https://rt-arb.rttv.com/dvr/rtarab/playlist_800Kb.m3u8" },
             { id: 4, name: "الحدث", logo: "https://i.ibb.co/Nd33d9rK/image.png", url: "https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8" },
@@ -274,8 +285,8 @@
             { id: 12, name: "العربية", logo: "https://i.ibb.co/3VFfw2Z/image.jpg", url: "https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8" },
             { id: 13, name: "التلفزيون العربي", logo: "https://i.ibb.co/m5gxf7jM/image.jpg", url: "https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70" },
             { id: 14, name: "الميادين", logo: "https://iili.io/CbBixNp.png", url: "https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8" },
-            { id: 15, name: "MBC MASR", logo: "https://i.ibb.co/4wsSd07j/image.png", url: "https://shd-gcp-live.lg.mncdn.com/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8" },
-            { id: 16, name: "MBC 1", logo: "https://iili.io/CbiU7Eb.png", url: "https://shd-gcp-live-orng.shahid.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c503a296dd0d8/index.m3u8" },
+            { id: 15, name: "MBC MASR", logo: "https://i.ibb.co/4wsSd07j/image.png", url: "https://shahid.mbc.net/ar/widgets/live-channel/mbc-masr", isEmbed: true },
+            { id: 16, name: "MBC 1", logo: "https://iili.io/CbiU7Eb.png", url: "https://shahid.mbc.net/ar/widgets/live-channel/mbc1", isEmbed: true },
             { id: 17, name: "MBC 5", logo: "https://i.ibb.co/6R4kp81h/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8" },
             { id: 18, name: "MBC 4", logo: "https://i.ibb.co/PGzB80dQ/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-4/24f134f1cd63db9346439e96b86ca6ed/index.m3u8" },
             { id: 19, name: "MBC Drama", logo: "https://i.ibb.co/G4s3njSJ/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-plus-drama/e37251ec2aac8f6c98f75cd0fa37cd28/index.m3u8" },
@@ -314,7 +325,6 @@
         const currentImg = document.getElementById('current-img');
         const currentTitle = document.getElementById('current-title');
 
-        // تهيئة مشغل Video.js
         const player = videojs('my-video');
 
         function loadChannel(channel) {
@@ -325,15 +335,17 @@
             document.querySelectorAll('.channel-card').forEach(card => card.classList.remove('active'));
             document.getElementById(`channel-${channel.id}`).classList.add('active');
 
-            const isDirectMedia = channel.url.includes('.m3u8') || channel.url.includes('.mp4');
-
             webview.style.display = 'none';
             fallback.style.display = 'none';
             player.el().style.display = 'none';
+            player.pause();
 
-            if (isDirectMedia) {
+            if (channel.isEmbed) {
+                // تفعيل وضع Embed لقنوات شاهد
+                webview.style.display = 'block';
+                webview.src = channel.url;
+            } else if (channel.url.includes('.m3u8') || channel.url.includes('.mp4')) {
                 player.el().style.display = 'block';
-                player.pause();
 
                 let streamUrl = channel.url;
                 if (channel.url.startsWith('http://') && window.location.protocol === 'https:') {
@@ -342,17 +354,9 @@
 
                 const mimeType = channel.url.includes('.mp4') ? 'video/mp4' : 'application/x-mpegURL';
 
-                player.src({
-                    src: streamUrl,
-                    type: mimeType
-                });
-
-                player.play().catch(error => {
-                    console.log("Autoplay is prevented or stream failed: ", error);
-                });
+                player.src({ src: streamUrl, type: mimeType });
+                player.play().catch(error => console.log(error));
             } else {
-                player.pause();
-
                 webview.style.display = 'block';
                 webview.src = channel.url;
                 externalLink.href = channel.url;
@@ -364,22 +368,27 @@
             }
         }
 
+        // تحسين العرض الكامل الإجباري بالوضع الأفقِي
         async function toggleFullScreen() {
             try {
-                if (!document.fullscreenElement) {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
                     if (mediaContainer.requestFullscreen) {
                         await mediaContainer.requestFullscreen();
                     } else if (mediaContainer.webkitRequestFullscreen) {
                         await mediaContainer.webkitRequestFullscreen();
                     }
 
+                    // قفل اتجاه الشاشة على الوضع الأفقي للهواتف
                     if (screen.orientation && screen.orientation.lock) {
-                        await screen.orientation.lock('landscape').catch(() => {});
+                        await screen.orientation.lock('landscape').catch(e => console.log(e));
                     }
                 } else {
                     if (document.exitFullscreen) {
                         await document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        await document.webkitExitFullscreen();
                     }
+
                     if (screen.orientation && screen.orientation.unlock) {
                         screen.orientation.unlock();
                     }
