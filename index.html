@@ -88,7 +88,6 @@
             height: fit-content;
         }
 
-        /* حاوية الفيديو ودعم الشاشة الكاملة الأفقية */
         .media-container {
             position: relative;
             padding-top: 56.25%;
@@ -246,8 +245,8 @@
                 <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" autoplay></video>
                 <iframe id="webview" style="display: none;" allow="autoplay; fullscreen" allowfullscreen></iframe>
                 <div id="fallback" class="web-fallback" style="display: none;">
-                    <p>هذه القناة محمية بسيرفرات شاهد وتتطلب الفتح المباشر</p>
-                    <a id="external-link" href="#" target="_blank" class="external-btn">شاهد القناة عبر المصدر الرسمي ↗</a>
+                    <p>هذه القناة تتطلب الفتح في نافذة جديدة نظراً لسياسة الحماية الخاصة برابطها</p>
+                    <a id="external-link" href="#" target="_blank" class="external-btn">فتح القناة في نافذة جديدة ↗</a>
                 </div>
             </div>
             <div class="current-info">
@@ -270,8 +269,7 @@
 
     <script>
         const channels = [
-            // تم تحديث نوع القنوات المحمية لتفتح عبر Embed مخصص أو التوجيه الذكي
-            { id: 1, name: "MBC 3", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shahid.mbc.net/ar/widgets/live-channel/mbc3", isEmbed: true },
+            { id: 1, name: "MBC 3 EUR", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
             { id: 2, name: "فلسطين اليوم", logo: "https://i.ibb.co/ddsMBs7/image.jpg", url: "https://live.paltodaytv.com/paltv/live/playlist_sfm4s.m3u8" },
             { id: 3, name: "روسيا اليوم", logo: "https://i.ibb.co/Jjk2k8qY/image.png", url: "https://rt-arb.rttv.com/dvr/rtarab/playlist_800Kb.m3u8" },
             { id: 4, name: "الحدث", logo: "https://i.ibb.co/Nd33d9rK/image.png", url: "https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8" },
@@ -285,8 +283,8 @@
             { id: 12, name: "العربية", logo: "https://i.ibb.co/3VFfw2Z/image.jpg", url: "https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8" },
             { id: 13, name: "التلفزيون العربي", logo: "https://i.ibb.co/m5gxf7jM/image.jpg", url: "https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8?orig=arabic&out=english,french,persian&default=&autoselect=no&line=70" },
             { id: 14, name: "الميادين", logo: "https://iili.io/CbBixNp.png", url: "https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8" },
-            { id: 15, name: "MBC MASR", logo: "https://i.ibb.co/4wsSd07j/image.png", url: "https://shahid.mbc.net/ar/widgets/live-channel/mbc-masr", isEmbed: true },
-            { id: 16, name: "MBC 1", logo: "https://iili.io/CbiU7Eb.png", url: "https://shahid.mbc.net/ar/widgets/live-channel/mbc1", isEmbed: true },
+            { id: 15, name: "MBC MASR", logo: "https://i.ibb.co/4wsSd07j/image.png", url: "https://shd-gcp-live.lg.mncdn.com/live/bitmovin-mbc-masr/956eac069c78a35d47245db6cdbb1575/index.m3u8" },
+            { id: 16, name: "MBC 1", logo: "https://iili.io/CbiU7Eb.png", url: "https://shd-gcp-live-orng.shahid.net/live/bitmovin-mbc-1-na/eec141533c90dd34722c503a296dd0d8/index.m3u8" },
             { id: 17, name: "MBC 5", logo: "https://i.ibb.co/6R4kp81h/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-5/ee6b000cee0629411b666ab26cb13e9b/index.m3u8" },
             { id: 18, name: "MBC 4", logo: "https://i.ibb.co/PGzB80dQ/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-4/24f134f1cd63db9346439e96b86ca6ed/index.m3u8" },
             { id: 19, name: "MBC Drama", logo: "https://i.ibb.co/G4s3njSJ/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-plus-drama/e37251ec2aac8f6c98f75cd0fa37cd28/index.m3u8" },
@@ -340,35 +338,40 @@
             player.el().style.display = 'none';
             player.pause();
 
-            if (channel.isEmbed) {
-                // تفعيل وضع Embed لقنوات شاهد
-                webview.style.display = 'block';
-                webview.src = channel.url;
-            } else if (channel.url.includes('.m3u8') || channel.url.includes('.mp4')) {
+            let targetUrl = channel.url;
+            
+            // تحويل بروتوكول http غير المشفر إلى https لتفادي حظر Mixed Content
+            if (targetUrl.startsWith('http://')) {
+                targetUrl = targetUrl.replace('http://', 'https://');
+            }
+
+            const isDirectMedia = targetUrl.includes('.m3u8') || targetUrl.includes('.mp4');
+
+            if (isDirectMedia) {
                 player.el().style.display = 'block';
 
-                let streamUrl = channel.url;
-                if (channel.url.startsWith('http://') && window.location.protocol === 'https:') {
-                    streamUrl = 'https://corsproxy.io/?' + encodeURIComponent(channel.url);
+                let streamUrl = targetUrl;
+                // استخدام السيرفر الوسيط CORS Proxy لتجاوز تقييدات CORS والترويسات
+                if (window.location.protocol === 'https:') {
+                    streamUrl = 'https://corsproxy.io/?' + encodeURIComponent(targetUrl);
                 }
 
-                const mimeType = channel.url.includes('.mp4') ? 'video/mp4' : 'application/x-mpegURL';
+                const mimeType = targetUrl.includes('.mp4') ? 'video/mp4' : 'application/x-mpegURL';
 
                 player.src({ src: streamUrl, type: mimeType });
-                player.play().catch(error => console.log(error));
-            } else {
+                player.play().catch(error => console.log("Autoplay issue: ", error));
+            } else if (targetUrl.includes('github.io')) {
+                // روابط HTML مثل إذاعة القرآن تعمل داخل iframe
                 webview.style.display = 'block';
-                webview.src = channel.url;
+                webview.src = targetUrl;
+            } else {
+                // الروابط الخارجية المحمية جداً تظهر كخيار فتح خارجي
+                webview.style.display = 'none';
+                fallback.style.display = 'flex';
                 externalLink.href = channel.url;
-                
-                if(channel.url.includes('arab-stream') || channel.url.includes('web24iptv')) {
-                    webview.style.display = 'none';
-                    fallback.style.display = 'flex';
-                }
             }
         }
 
-        // تحسين العرض الكامل الإجباري بالوضع الأفقِي
         async function toggleFullScreen() {
             try {
                 if (!document.fullscreenElement && !document.webkitFullscreenElement) {
@@ -378,7 +381,6 @@
                         await mediaContainer.webkitRequestFullscreen();
                     }
 
-                    // قفل اتجاه الشاشة على الوضع الأفقي للهواتف
                     if (screen.orientation && screen.orientation.lock) {
                         await screen.orientation.lock('landscape').catch(e => console.log(e));
                     }
