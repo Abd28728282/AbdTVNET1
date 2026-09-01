@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة البث المباشر | المطور عبد الحي</title>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -310,6 +311,15 @@
         const currentTitle = document.getElementById('current-title');
         let hls = new Hls();
 
+        // دوال معالجة روابط HTTP البروكسي للتوافق مع HTTPS
+        function getSecureUrl(originalUrl) {
+            if (window.location.protocol === 'https:' && originalUrl.startsWith('http://')) {
+                // استخدام بروكسي آمن وموثوق لربط الـ http بشبكة https
+                return 'https://corsproxy.io/?' + encodeURIComponent(originalUrl);
+            }
+            return originalUrl;
+        }
+
         function loadChannel(channel) {
             currentTitle.textContent = channel.name;
             currentImg.src = channel.logo;
@@ -320,39 +330,38 @@
 
             const isDirectMedia = channel.url.includes('.m3u8') || channel.url.includes('.mp4');
 
-            // إعادة ضبط العرض
             webview.style.display = 'none';
             fallback.style.display = 'none';
             video.style.display = 'none';
+
+            // تحويل الرابط تلقائياً إلى رابط آمن إذا كان ينتهي بـ http وموقعك https
+            const targetUrl = getSecureUrl(channel.url);
 
             if (isDirectMedia) {
                 video.style.display = 'block';
                 if (channel.url.includes('.mp4')) {
                     if (Hls.isSupported()) hls.detachMedia();
-                    video.src = channel.url;
+                    video.src = targetUrl;
                     video.play();
                 } else if (Hls.isSupported()) {
                     hls.destroy();
                     hls = new Hls();
-                    hls.loadSource(channel.url);
+                    hls.loadSource(targetUrl);
                     hls.attachMedia(video);
                     hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
                 } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = channel.url;
+                    video.src = targetUrl;
                     video.addEventListener('loadedmetadata', () => video.play());
                 }
             } else {
-                // التعامل مع صفحات الويب التي قد تمنع التضمين وتسبب الشاشة السوداء
                 if (Hls.isSupported()) hls.detachMedia();
                 video.pause();
 
                 webview.style.display = 'block';
-                webview.src = channel.url;
+                webview.src = targetUrl;
 
-                // توفير زر بديل في حال محاصرة الصفحة وحظرها
                 externalLink.href = channel.url;
                 
-                // إظهار الخيار البديل تلقائياً للمواقع الشهيرة بالحظر مثل MBC 2
                 if(channel.url.includes('arab-stream') || channel.url.includes('web24iptv')) {
                     webview.style.display = 'none';
                     fallback.style.display = 'flex';
@@ -360,7 +369,6 @@
             }
         }
 
-        // تفعيل الشاشة الكاملة بالوضع الأفقي
         async function toggleFullScreen() {
             try {
                 if (!document.fullscreenElement) {
@@ -370,7 +378,6 @@
                         await mediaContainer.webkitRequestFullscreen();
                     }
 
-                    // قفل الاتجاه بالوضع الأفقي للجوالات
                     if (screen.orientation && screen.orientation.lock) {
                         await screen.orientation.lock('landscape').catch(() => {});
                     }
