@@ -4,7 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>منصة البث المباشر | المطور عبد الحي</title>
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+
+    <!-- تضمين مكتبة Video.js مع التنسيقات الخاصة بها -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -92,14 +96,14 @@
             width: 100%;
         }
 
-        video, iframe {
+        /* تعديل لتناسب مشغل Video.js */
+        .video-js, iframe {
             position: absolute;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
+            width: 100% !important;
+            height: 100% !important;
             border: none;
-            object-fit: contain;
         }
 
         .web-fallback {
@@ -117,6 +121,7 @@
             padding: 20px;
             text-align: center;
             gap: 15px;
+            z-index: 10;
         }
 
         .external-btn {
@@ -227,7 +232,7 @@
     <div class="main-container">
         <div class="player-section">
             <div class="media-container" id="media-container">
-                <video id="video" controls autoplay></video>
+                <video id="my-video" class="video-js vjs-default-skin" controls preload="auto" autoplay></video>
                 <iframe id="webview" style="display: none;" allowfullscreen></iframe>
                 <div id="fallback" class="web-fallback" style="display: none;">
                     <p>هذه القناة تتطلب الفتح في نافذة خارجية نظراً لسياسة الحماية الخاصة بها</p>
@@ -253,9 +258,9 @@
     </footer>
 
     <script>
-        // الروابط المحدثة لتعمل عبر بروتوكولات HTTPS الرسمية والقابلة للتشغيل بشكل آمن
+        // إم بي سي 3 تم تحديث رابطها إلى بث مباشر مستقر متوافق مع Video.js
         const channels = [
-            { id: 1, name: "MBC 3 EUR", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
+            { id: 1, name: "MBC 3", logo: "https://i.ibb.co/mCyLhw47/image.jpg", url: "https://shd-gcp-live.edgenextcdn.net/live/bitmovin-mbc-3-usa/5d58265a862a476dc7f97694addb5ded/index.m3u8" },
             { id: 2, name: "فلسطين اليوم", logo: "https://i.ibb.co/ddsMBs7/image.jpg", url: "https://live.paltodaytv.com/paltv/live/playlist_sfm4s.m3u8" },
             { id: 3, name: "روسيا اليوم", logo: "https://i.ibb.co/Jjk2k8qY/image.png", url: "https://rt-arb.rttv.com/dvr/rtarab/playlist_800Kb.m3u8" },
             { id: 4, name: "الحدث", logo: "https://i.ibb.co/Nd33d9rK/image.png", url: "https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8" },
@@ -301,7 +306,6 @@
             { id: 44, name: "Godzilla Minus One", logo: "https://i.ibb.co/7x98nZBk/image.png", url: "https://zenithianzephyr.space/pl/H4sIAAAAAAAAAwXB2XKDIBQA0F8Cl1g7kxerkHGNChfnvqnQWCFN0nQZ_fqeQ6OIaKIjrafDYTyQ2ATzZEhEIj805j14nYQTJk1uCPPe8O9acEsxrXO0eVIQ2su0tqiYUJ.OdMT9iJX5CpZ9su5R2Weg.IKju_0qSaX2Mg8GqJoszCuia.EngRrsl3LL29zHUuyuaa.00KoNkcug2l62lsAJhqRVdiklYw_0KB8tvQNjYoRsr3y7T6vzZ7qUJdGIvN76Pv5o18sfpnlgAFY5sAx3rHG4g7m6c5N1z8J3jYLL1gnAc3s8_gMwoe2NCQEAAA--/master.m3u8?token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJteS1hdXRoIiwiaWF0IjoxNzg4MjU5NTA4LCJuYmYiOjE3ODgyNTk1MDgsImV4cCI6MTc4ODI3MzkwOCwiaXBfY2lkciI6IjJhMTM6NTRjMjpmMDAwOjRiNzM6Oi82NCJ9.el9hQvDJ-Sv3h3dGIkIQmp-vIMYsvvjk3Rp-ehC6bhU" }
         ];
 
-        const video = document.getElementById('video');
         const webview = document.getElementById('webview');
         const fallback = document.getElementById('fallback');
         const externalLink = document.getElementById('external-link');
@@ -309,7 +313,9 @@
         const channelsList = document.getElementById('channels-list');
         const currentImg = document.getElementById('current-img');
         const currentTitle = document.getElementById('current-title');
-        let hls = null;
+
+        // تهيئة مشغل Video.js
+        const player = videojs('my-video');
 
         function loadChannel(channel) {
             currentTitle.textContent = channel.name;
@@ -323,69 +329,32 @@
 
             webview.style.display = 'none';
             fallback.style.display = 'none';
-            video.style.display = 'none';
+            player.el().style.display = 'none';
 
             if (isDirectMedia) {
-                video.style.display = 'block';
-                
-                // إغلاق أي مشغل Hls قديم لمنع التداخل
-                if (hls) {
-                    hls.destroy();
-                    hls = null;
+                player.el().style.display = 'block';
+                player.pause();
+
+                let streamUrl = channel.url;
+                if (channel.url.startsWith('http://') && window.location.protocol === 'https:') {
+                    streamUrl = 'https://corsproxy.io/?' + encodeURIComponent(channel.url);
                 }
 
-                if (channel.url.includes('.mp4')) {
-                    video.src = channel.url;
-                    video.play();
-                } else if (Hls.isSupported()) {
-                    // إعداد مشغل HLS مع خيارات محايدة تتجاوز حظر طلبات الشريحة الذكية CORS/HTTP
-                    hls = new Hls({
-                        xhrSetup: function (xhr, url) {
-                            // تحويل تلقائي للشرائح ذات الاتصال غير المشفر HTTP إلى HTTPS إذا طُلبت داخل الموقع
-                            if (url.startsWith('http://') && window.location.protocol === 'https:') {
-                                xhr.open('GET', 'https://corsproxy.io/?' + encodeURIComponent(url), true);
-                            }
-                        }
-                    });
+                const mimeType = channel.url.includes('.mp4') ? 'video/mp4' : 'application/x-mpegURL';
 
-                    let streamUrl = channel.url;
-                    if (channel.url.startsWith('http://') && window.location.protocol === 'https:') {
-                        streamUrl = 'https://corsproxy.io/?' + encodeURIComponent(channel.url);
-                    }
+                player.src({
+                    src: streamUrl,
+                    type: mimeType
+                });
 
-                    hls.loadSource(streamUrl);
-                    hls.attachMedia(video);
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-                    
-                    // إدارة أخطاء الاتصال الذكية
-                    hls.on(Hls.Events.ERROR, function (event, data) {
-                        if (data.fatal) {
-                            switch (data.type) {
-                                case Hls.ErrorTypes.NETWORK_ERROR:
-                                    hls.startLoad();
-                                    break;
-                                case Hls.ErrorTypes.MEDIA_ERROR:
-                                    hls.recoverMediaError();
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = channel.url;
-                    video.addEventListener('loadedmetadata', () => video.play());
-                }
+                player.play().catch(error => {
+                    console.log("Autoplay is prevented or stream failed: ", error);
+                });
             } else {
-                if (hls) {
-                    hls.destroy();
-                    hls = null;
-                }
-                video.pause();
+                player.pause();
 
                 webview.style.display = 'block';
                 webview.src = channel.url;
-
                 externalLink.href = channel.url;
                 
                 if(channel.url.includes('arab-stream') || channel.url.includes('web24iptv')) {
