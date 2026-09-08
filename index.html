@@ -96,7 +96,6 @@
             flex-shrink: 0;
         }
 
-        /* في الشاشة الكاملة، يتم إخفاء الشريط العلوي والتنقل بالكامل */
         .sadeem-container:fullscreen .sadeem-header,
         .sadeem-container:-webkit-full-screen .sadeem-header {
             display: none !important;
@@ -135,7 +134,7 @@
             display: flex;
         }
 
-        /* تصميم قسم البانر مع زر المشاهدة الثابت (لا يخترق ولا يختفي) */
+        /* تصميم قسم البانر مع زر المشاهدة الثابت */
         .hero-banner-box {
             padding: 16px;
             flex-shrink: 0;
@@ -277,7 +276,6 @@
             transition: height 0.3s ease;
         }
 
-        /* في وضع الشاشة الكاملة، يأخذ المشغل الحاوية بالكامل ويخفي باقي عناصر الشاشة */
         .sadeem-container:fullscreen .player-wrapper,
         .sadeem-container:-webkit-full-screen .player-wrapper {
             width: 100vw !important;
@@ -296,7 +294,7 @@
             object-fit: contain;
         }
 
-        /* البروجرس بار الدائري فائق السرعة */
+        /* البروجرس بار الدائري */
         .circular-loader {
             position: absolute;
             width: 50px;
@@ -319,7 +317,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* أزرار التحكم بالمشغل */
+        /* أزرار التحكم بالمشغل (النظام الاحترافي الجديد) */
         .player-controls {
             position: absolute;
             bottom: 0;
@@ -331,14 +329,16 @@
             flex-direction: column;
             gap: 8px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
             pointer-events: none;
             z-index: 60;
         }
 
-        .player-wrapper:hover .player-controls,
-        .player-wrapper.touch-active .player-controls {
+        /* عند تفعيل الحالة عبر الكلاس تظهر الأزرار بسلاسة */
+        .player-wrapper.controls-visible .player-controls {
             opacity: 1;
+            visibility: visible;
             pointer-events: auto;
         }
 
@@ -452,7 +452,7 @@
 
         .sadeem-container:fullscreen .current-info-bar,
         .sadeem-container:-webkit-full-screen .current-info-bar {
-            display: none !important; /* إخفاء معلومات القناة بالكامل في وضع الشاشة الكاملة لتوفير شاشة سينمائية نقية 100% */
+            display: none !important;
         }
 
         .current-info-bar img {
@@ -479,7 +479,7 @@
             border-radius: 6px;
         }
 
-        /* قوائم القنوات العمودية داخل شاشة المشغل */
+        /* قوائم القنوات العمودية */
         .channels-list-box {
             flex: 1;
             overflow-y: auto;
@@ -491,7 +491,7 @@
 
         .sadeem-container:fullscreen .channels-list-box,
         .sadeem-container:-webkit-full-screen .channels-list-box {
-            display: none !important; /* إخفاء قائمة القنوات كلياً أثناء الشاشة الكاملة لكي لا يستطيع المستخدم تبديل القنوات إلا بالخروج */
+            display: none !important;
         }
 
         .channel-row-item {
@@ -566,7 +566,7 @@
 
         .sadeem-container:fullscreen .sadeem-bottom-nav,
         .sadeem-container:-webkit-full-screen .sadeem-bottom-nav {
-            display: none !important; /* إخفاء شريط التنقل السفلي تماماً في الشاشة الكاملة */
+            display: none !important;
         }
 
         .nav-btn {
@@ -608,7 +608,6 @@
 
         <!-- 1. الشاشة الرئيسية -->
         <div class="app-screen active" id="screenHome">
-            <!-- قسم زر البث الثابت الذي لا يمكن أن يختفي أبدًا -->
             <div class="hero-banner-box">
                 <div class="hero-banner">
                     <h1>آفاق البث الفضائي</h1>
@@ -623,7 +622,7 @@
 
         <!-- 2. شاشة المشغل -->
         <div class="app-screen" id="screenPlayer">
-            <div class="player-wrapper" id="playerWrapper" onclick="togglePlayerControls()">
+            <div class="player-wrapper controls-visible" id="playerWrapper" onclick="togglePlayerControls()">
                 <div class="circular-loader" id="circularLoader"></div>
                 <video id="mainVideo" playsinline webkit-playsinline></video>
                 
@@ -889,7 +888,6 @@
             currentLogo.src = ch.logo;
             playerWrapper.classList.add('is-loading');
 
-            // تحسين أداء وسرعة البث المباشر عبر تقليل البافر وتحسين المزامنة الفورية
             if (Hls.isSupported()) {
                 if (hlsInstance) hlsInstance.destroy();
                 hlsInstance = new Hls({
@@ -906,6 +904,7 @@
                         playerWrapper.classList.remove('is-loading');
                     }).catch(e => console.log("Autoplay restricted"));
                     updatePlayIcon(true);
+                    resetControlsTimer(); // بدء مؤقت الإخفاء التلقائي عند تشغيل القناة
                 });
                 hlsInstance.on(Hls.Events.ERROR, (evt, data) => {
                     if (data.fatal) {
@@ -923,6 +922,7 @@
                     playerWrapper.classList.remove('is-loading');
                 });
                 updatePlayIcon(true);
+                resetControlsTimer();
             }
         }
 
@@ -965,6 +965,7 @@
                 video.pause();
                 updatePlayIcon(false);
             }
+            resetControlsTimer();
         }
 
         function updatePlayIcon(isPlaying) {
@@ -978,6 +979,7 @@
         function handleMute(e) {
             e.stopPropagation();
             video.muted = !video.muted;
+            resetControlsTimer();
         }
 
         function handleFullscreen(e) {
@@ -1007,6 +1009,7 @@
                     screen.orientation.unlock().catch(() => {});
                 }
             }
+            resetControlsTimer();
         }
 
         function tryRotateLandscape() {
@@ -1017,13 +1020,31 @@
             }
         }
 
-        let ctrlTimeout;
+        // نظام التحكم الاحترافي في إظهار وإخفاء الأزرار عند الضغط التلقائي أو بعد 3 ثوانٍ
+        let hideTimer = null;
+
         function togglePlayerControls() {
-            playerWrapper.classList.toggle('touch-active');
-            clearTimeout(ctrlTimeout);
-            ctrlTimeout = setTimeout(() => {
-                playerWrapper.classList.remove('touch-active');
-            }, 3500);
+            if (playerWrapper.classList.contains('controls-visible')) {
+                // إذا كانت ظاهرة وأراد المستخدم إخفاءها بالنقر
+                playerWrapper.classList.remove('controls-visible');
+                clearTimeout(hideTimer);
+            } else {
+                // إذا كانت مخفية وأراد إظهارها
+                playerWrapper.classList.add('controls-visible');
+                resetControlsTimer();
+            }
+        }
+
+        function resetControlsTimer() {
+            clearTimeout(hideTimer);
+            playerWrapper.classList.add('controls-visible');
+            
+            // إخفاء الأزرار تلقائياً بعد 3 ثوانٍ
+            hideTimer = setTimeout(() => {
+                if (!video.paused) {
+                    playerWrapper.classList.remove('controls-visible');
+                }
+            }, 3000);
         }
 
         fetchChannels();
