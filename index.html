@@ -679,8 +679,9 @@
                             <button class="c-btn" id="playPauseBtn" onclick="handlePlayPause(event)">
                                 <svg id="playPauseIcon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                             </button>
-                            <button class="c-btn" onclick="handleMute(event)">
-                                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                            <!-- زر الصوت مع الأيقونة الديناميكية المتغيرة -->
+                            <button class="c-btn" id="muteBtn" onclick="handleMute(event)">
+                                <svg id="muteIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                             </button>
                             <span class="time-txt" id="timeTxt">بث مباشر</span>
                         </div>
@@ -708,7 +709,6 @@
         <div class="app-screen" id="screenChannels">
             <div style="padding: 15px 16px 5px; font-size: 15px; font-weight: 900; color: #fff;">دليل القنوات والبحث</div>
             
-            <!-- حقل البحث الفوري -->
             <div class="search-box-container" style="padding-top: 10px;">
                 <div class="search-input-wrapper">
                     <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
@@ -743,6 +743,7 @@
         const circularLoader = document.getElementById('circularLoader');
         const sadeemContainer = document.getElementById('sadeemContainer');
         const playPauseIcon = document.getElementById('playPauseIcon');
+        const muteIcon = document.getElementById('muteIcon');
         const playProgress = document.getElementById('playProgress');
         const bufferProgress = document.getElementById('bufferProgress');
         const seekbarHandle = document.getElementById('seekbarHandle');
@@ -936,7 +937,6 @@
             container.appendChild(frag);
         }
 
-        // دالة البحث الفوري
         function filterChannels(query) {
             const term = query.trim().toLowerCase();
             if (!term) {
@@ -947,10 +947,21 @@
             renderChannelsList(filtered, fullChannelsListBox);
         }
 
+        // اختيار قناة جديدة وتصفير المشغل بالكامل
         function playChannel(index) {
             const ch = channelsData[index];
             if (!ch) return;
 
+            // 1. تصفير المشغل وإيقاف البث الحالي تماماً
+            if (hlsInstance) {
+                hlsInstance.destroy();
+                hlsInstance = null;
+            }
+            video.pause();
+            video.removeAttribute('src');
+            video.load();
+
+            // 2. تحديث قائمة القنوات النشطة والواجهة
             document.querySelectorAll('.channel-row-item').forEach(el => el.classList.remove('active'));
             const activeRow = document.getElementById(`ch-row-${index}`);
             if (activeRow) {
@@ -962,8 +973,8 @@
             currentLogo.src = ch.logo;
             playerWrapper.classList.add('is-loading');
 
+            // 3. تشغيل الرابط الجديد مع معالجة مسارات الصوت لضمان عدم الصمت
             if (Hls.isSupported()) {
-                if (hlsInstance) hlsInstance.destroy();
                 hlsInstance = new Hls({
                     maxBufferLength: 4,
                     maxMaxBufferLength: 8,
@@ -973,13 +984,19 @@
                 });
                 hlsInstance.loadSource(ch.url);
                 hlsInstance.attachMedia(video);
+                
                 hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
+                    // اختيار مسار الصوت التلقائي لضمان عمل الصوت في جميع القنوات
+                    if (hlsInstance.audioTracks && hlsInstance.audioTracks.length > 0) {
+                        hlsInstance.audioTrack = 0;
+                    }
                     video.play().then(() => {
                         playerWrapper.classList.remove('is-loading');
                     }).catch(e => console.log("Autoplay restricted"));
                     updatePlayIcon(true);
                     resetControlsTimer();
                 });
+
                 hlsInstance.on(Hls.Events.ERROR, (evt, data) => {
                     if (data.fatal) {
                         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hlsInstance.startLoad();
@@ -1050,10 +1067,22 @@
             }
         }
 
+        // تحكم متطور في الكتم وتغيير الأيقونة ديناميكياً
         function handleMute(e) {
             e.stopPropagation();
             video.muted = !video.muted;
+            updateMuteIcon(video.muted);
             resetControlsTimer();
+        }
+
+        function updateMuteIcon(isMuted) {
+            if (isMuted) {
+                // أيقونة كتم الصوت
+                muteIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+            } else {
+                // أيقونة الصوت العادي
+                muteIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+            }
         }
 
         function handleFullscreen(e) {
