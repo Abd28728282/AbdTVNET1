@@ -30,7 +30,7 @@
             overflow-x: hidden;
         }
 
-        /* حاوية الهاتف الأساسية (عند ملء الشاشة ستتمدد بشكل فخم تحافظ على كل التصميم) */
+        /* حاوية الهاتف الأساسية */
         .mobile-frame {
             width: 100%;
             max-width: 480px;
@@ -43,9 +43,10 @@
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
         }
 
-        /* إذا دخلت الحاوية في وضع ملء الشاشة، تجعل الخلفية سوداء سينمائية وتوسّط المحتوى */
+        /* عند ملء الشاشة للحاوية بالكامل */
         .mobile-frame:fullscreen {
             max-width: 100% !important;
+            width: 100vw !important;
             height: 100vh !important;
             border-radius: 0 !important;
             border: none !important;
@@ -53,6 +54,7 @@
         }
         .mobile-frame:-webkit-full-screen {
             max-width: 100% !important;
+            width: 100vw !important;
             height: 100vh !important;
             border-radius: 0 !important;
             border: none !important;
@@ -252,7 +254,7 @@
             text-overflow: ellipsis;
         }
 
-        /* شاشة المشغل الخاص والنظيف */
+        /* شاشة المشغل */
         .player-screen {
             display: flex;
             flex-direction: column;
@@ -268,12 +270,12 @@
             justify-content: center;
         }
 
-        /* في وضع ملء الشاشة للحاوية، نكبر مساحة المشغل لتملاء الشاشة بانسجام */
+        /* في وضع ملء الشاشة، نجعل المشغل يأخذ مساحة سينمائية مريحة جداً وتظهر القائمة تحته بمرونة */
         .mobile-frame:fullscreen .mobile-video-container {
-            height: 45vh;
+            height: 52vh;
         }
         .mobile-frame:-webkit-full-screen .mobile-video-container {
-            height: 45vh;
+            height: 52vh;
         }
 
         .mobile-video-container video {
@@ -304,7 +306,7 @@
             pointer-events: auto;
         }
 
-        /* شريط التخزين المؤقت والتقدم (Seekbar & Buffer Bar) من اليسار لليمين تماماً */
+        /* **تم الإصلاح:** شريط التقدم والتخزين المؤقت من اليسار لليمين 100% */
         .seekbar-wrapper {
             position: relative;
             width: 100%;
@@ -312,7 +314,8 @@
             display: flex;
             align-items: center;
             cursor: pointer;
-            direction: ltr; /* لضمان التعبئة تبدأ من اليسار إلى اليمين */
+            direction: ltr !important;
+            unicode-bidi: bidi-override;
         }
 
         .seekbar-bg {
@@ -322,9 +325,10 @@
             background: rgba(255, 255, 255, 0.2);
             border-radius: 3px;
             overflow: hidden;
+            direction: ltr !important;
         }
 
-        /* شريط التخزين المؤقت (Buffer Bar) يبدأ من اليسار */
+        /* شريط التخزين المؤقت يبدأ تماماً من اليسار */
         .buffer-bar {
             position: absolute;
             top: 0;
@@ -333,10 +337,9 @@
             background: rgba(255, 255, 255, 0.4);
             width: 0%;
             border-radius: 3px;
-            transition: width 0.2s ease;
         }
 
-        /* شريط التقدم الفعلي يبدأ من اليسار إلى اليمين */
+        /* شريط التقدم الفعلي يبدأ حصرياً من اليسار إلى اليمين */
         .progress-bar {
             position: absolute;
             top: 0;
@@ -347,7 +350,6 @@
             border-radius: 3px;
         }
 
-        /* كرة التحكم بالسحب على الشريط */
         .seekbar-thumb {
             position: absolute;
             left: 0%;
@@ -406,7 +408,7 @@
         }
 
         .current-playing-card {
-            padding: 15px;
+            padding: 12px 15px;
             background: #111827;
             border-bottom: 1px solid #1f2937;
             display: flex;
@@ -415,8 +417,8 @@
         }
 
         .current-playing-card img {
-            width: 45px;
-            height: 45px;
+            width: 40px;
+            height: 40px;
             object-fit: contain;
             background: #05070b;
             border-radius: 10px;
@@ -424,14 +426,14 @@
         }
 
         .current-details h3 {
-            font-size: 14px;
+            font-size: 13px;
             font-weight: 800;
             color: #fff;
             margin-bottom: 2px;
         }
 
         .current-details span {
-            font-size: 11px;
+            font-size: 10px;
             color: #38bdf8;
             background: rgba(56, 189, 248, 0.1);
             padding: 2px 8px;
@@ -442,18 +444,18 @@
         .vertical-playlist {
             flex: 1;
             overflow-y: auto;
-            padding: 15px;
+            padding: 12px 15px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 8px;
         }
 
-        /* في وضع ملء الشاشة للحاوية، نمنح القائمة مساحة أكبر للتصفح */
+        /* ضبط القائمة في وضع ملء الشاشة لتظهر بشكل مثالي ولا تتداخل مع النافيجيشن */
         .mobile-frame:fullscreen .vertical-playlist {
-            max-height: calc(55vh - 70px);
+            max-height: calc(48vh - 110px);
         }
         .mobile-frame:-webkit-full-screen .vertical-playlist {
-            max-height: calc(55vh - 70px);
+            max-height: calc(48vh - 110px);
         }
 
         .playlist-item {
@@ -478,8 +480,8 @@
         }
 
         .playlist-item img {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             object-fit: contain;
             background: #05070b;
             border-radius: 8px;
@@ -551,7 +553,7 @@
 </head>
 <body>
 
-    <!-- حاوية الهاتف الأساسية (التي ستدخل بالكامل في وضع ملء الشاشة) -->
+    <!-- حاوية الهاتف الأساسية -->
     <div class="mobile-frame" id="mobileFrame">
         
         <!-- شريط علوي -->
@@ -574,15 +576,15 @@
             </div>
         </div>
 
-        <!-- المشغل الخاص والنظيف -->
+        <!-- المشغل الخاص -->
         <div class="screen hidden-right player-screen" id="playerScreen">
             <div class="mobile-video-container" id="videoContainer" onclick="toggleControls()">
                 <video id="customVideo" playsinline webkit-playsinline></video>
                 
-                <!-- لوحة التحكم الاحترافية مع SeekBar من اليسار لليمين -->
+                <!-- لوحة التحكم الاحترافية -->
                 <div class="custom-video-controls" id="videoControls">
                     
-                    <!-- شريط التقدم والتخزين المؤقت (من اليسار لليمين) -->
+                    <!-- شريط التقدم والتخزين المؤقت (من اليسار لليمين بدقة) -->
                     <div class="seekbar-wrapper" id="seekbarWrapper">
                         <div class="seekbar-bg">
                             <div class="buffer-bar" id="bufferBar"></div>
@@ -594,7 +596,7 @@
                     <!-- أزرار التحكم -->
                     <div class="controls-row">
                         <div class="controls-group-right">
-                            <!-- زر التشغيل / الإيقاف -->
+                            <!-- زر التشغيل / الإيقاف الواضح -->
                             <button class="ctrl-btn" id="playPauseBtn" onclick="togglePlayPause(event)">
                                 <svg id="playPauseIcon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                             </button>
@@ -606,7 +608,7 @@
                         </div>
 
                         <div class="controls-group-left">
-                            <!-- زر ملء الشاشة (يكبر الحاوية بالكامل ليحافظ على التصميم) -->
+                            <!-- زر ملء الشاشة للحاوية بالكامل -->
                             <button class="ctrl-btn" onclick="toggleFullscreen(event)">
                                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                             </button>
@@ -811,7 +813,7 @@
             }
         }
 
-        // تحديث شريط التقدم والتخزين المؤقت (من اليسار لليمين)
+        // تحديث شريط التقدم والتخزين المؤقت من اليسار لليمين بدقة مئوية
         video.addEventListener('timeupdate', () => {
             if (!video.duration) return;
             const current = video.currentTime;
@@ -847,8 +849,10 @@
 
         function updatePlayPauseIcon(isPlaying) {
             if (isPlaying) {
+                // أيقونة الإيقاف المؤقت (Pause)
                 playPauseIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             } else {
+                // أيقونة التشغيل (Play)
                 playPauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
             }
         }
@@ -858,7 +862,6 @@
             video.muted = !video.muted;
         }
 
-        // تفعيل وضع ملء الشاشة للحاوية كاملة ليبقى التصميم الأسطوري والمشغل مظبوطين تماماً
         function toggleFullscreen(e) {
             e.stopPropagation();
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
