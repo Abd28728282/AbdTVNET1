@@ -45,7 +45,7 @@
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
         }
 
-        /* تحسين وضع الشاشة الكاملة لتكون أفقية تلقائياً وبملء الشاشة الفعلي */
+        /* وضع الشاشة الكاملة بملء الشاشة الفعلي والأفقي التلقائي */
         .sadeem-container:fullscreen {
             max-width: 100vw !important;
             width: 100vw !important;
@@ -264,7 +264,7 @@
             flex-shrink: 0;
         }
 
-        /* في وضع الشاشة الكاملة، اجعل المشغل يأخذ المساحة الكاملة بالشكل الأفقي الرائع */
+        /* في وضع الشاشة الكاملة، اجخذ المشغل المساحة الكاملة بالشكل الأفقي */
         .sadeem-container:fullscreen .player-wrapper {
             height: 100vh !important;
             height: 100dvh !important;
@@ -438,7 +438,7 @@
 
         .sadeem-container:fullscreen .current-info-bar,
         .sadeem-container:-webkit-full-screen .current-info-bar {
-            display: none !important; /* إخفاء معلومات القناة في وضع الشاشة الكاملة لتوفير مساحة أفقية نقية للفيديو */
+            display: none !important; /* إخفاء معلومات القناة في وضع الشاشة الكاملة لتوفير مساحة أفقية نقية */
         }
 
         .current-info-bar img {
@@ -624,7 +624,8 @@
                             <span class="time-txt" id="timeTxt">بث مباشر</span>
                         </div>
                         <div class="flex-group">
-                            <button class="c-btn" onclick="handleFullscreen(event)">
+                            <!-- زر الشاشة الكاملة المباشر والآمن -->
+                            <button class="c-btn" id="fullscreenBtn" onclick="handleFullscreen(event)">
                                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                             </button>
                         </div>
@@ -955,26 +956,46 @@
             video.muted = !video.muted;
         }
 
+        // دالة الشاشة الكاملة المحسنة والموثوقة للمتصفحات
         function handleFullscreen(e) {
             e.stopPropagation();
             
-            // محاولة توجيه الشاشة أفقياً تلقائياً إذا دعم المتصفح خاصية Screen Orientation API
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch(() => {});
-            }
+            const isFull = document.fullscreenElement || document.webkitFullscreenElement;
 
-            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+            if (!isFull) {
+                // تفعيل الشاشة الكاملة للحاوية الرئيسية
                 if (sadeemContainer.requestFullscreen) {
-                    sadeemContainer.requestFullscreen();
+                    sadeemContainer.requestFullscreen().then(() => {
+                        tryRotateLandscape();
+                    }).catch(() => {
+                        tryRotateLandscape();
+                    });
                 } else if (sadeemContainer.webkitRequestFullscreen) {
                     sadeemContainer.webkitRequestFullscreen();
+                    tryRotateLandscape();
+                } else if (video.webkitEnterFullscreen) {
+                    // دعم احتياطي لأجهزة آبل آيفون (iOS)
+                    video.webkitEnterFullscreen();
                 }
             } else {
+                // الخروج من الشاشة الكاملة
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
                 }
+                // إعادة الوضع الطبيعي للشاشة
+                if (screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock().catch(() => {});
+                }
+            }
+        }
+
+        function tryRotateLandscape() {
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch((err) => {
+                    console.log("Landscape lock not supported or restricted:", err);
+                });
             }
         }
 
