@@ -45,7 +45,7 @@
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
         }
 
-        /* وضع الشاشة الكاملة الفعلي (يغطي الشاشة بالكامل ويمنع عرض أي شيء آخر) */
+        /* وضع الشاشة الكاملة الفعلي */
         .sadeem-container:fullscreen {
             max-width: 100vw !important;
             width: 100vw !important;
@@ -190,6 +190,46 @@
             background: #f1f5f9;
         }
 
+        /* حقل البحث العصري */
+        .search-box-container {
+            padding: 0 16px 12px;
+            flex-shrink: 0;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper svg {
+            position: absolute;
+            right: 14px;
+            width: 18px;
+            height: 18px;
+            fill: #94a3b8;
+            pointer-events: none;
+        }
+
+        .search-input {
+            width: 100%;
+            background: #111827;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 12px;
+            padding: 11px 42px 11px 16px;
+            color: #fff;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: #38bdf8;
+            background: #0f172a;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
         /* العناوين والأقسام الأفقية */
         .section-title {
             padding: 0 16px;
@@ -317,7 +357,7 @@
             100% { transform: rotate(360deg); }
         }
 
-        /* أزرار التحكم بالمشغل (النظام الاحترافي الجديد) */
+        /* أزرار التحكم بالمشغل */
         .player-controls {
             position: absolute;
             bottom: 0;
@@ -335,7 +375,6 @@
             z-index: 60;
         }
 
-        /* عند تفعيل الحالة عبر الكلاس تظهر الأزرار بسلاسة */
         .player-wrapper.controls-visible .player-controls {
             opacity: 1;
             visibility: visible;
@@ -665,9 +704,18 @@
             <div class="channels-list-box" id="channelsListBox" style="padding-bottom: 75px;"></div>
         </div>
 
-        <!-- 3. شاشة قائمة القنوات الكاملة -->
+        <!-- 3. شاشة قائمة القنوات والبحث الكاملة -->
         <div class="app-screen" id="screenChannels">
-            <div style="padding: 15px 16px 5px; font-size: 15px; font-weight: 900; color: #fff;">دليل القنوات الكاملة</div>
+            <div style="padding: 15px 16px 5px; font-size: 15px; font-weight: 900; color: #fff;">دليل القنوات والبحث</div>
+            
+            <!-- حقل البحث الفوري -->
+            <div class="search-box-container" style="padding-top: 10px;">
+                <div class="search-input-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن اسم القناة..." oninput="filterChannels(this.value)">
+                </div>
+            </div>
+
             <div class="channels-list-box" id="fullChannelsListBox" style="padding-bottom: 75px;"></div>
         </div>
 
@@ -713,6 +761,7 @@
         const fullChannelsListBox = document.getElementById('fullChannelsListBox');
         const currentTitle = document.getElementById('currentTitle');
         const currentLogo = document.getElementById('currentLogo');
+        const searchInput = document.getElementById('searchInput');
 
         let hlsInstance = null;
         let channelsData = [];
@@ -816,12 +865,12 @@
                 }
             }
             renderAllUI();
+            renderChannelsList(channelsData, fullChannelsListBox);
         }
 
         function renderAllUI() {
             homeCategoriesContainer.innerHTML = '';
             channelsListBox.innerHTML = '';
-            fullChannelsListBox.innerHTML = '';
 
             for (const [group, list] of Object.entries(groupedData)) {
                 let cardsHtml = '';
@@ -845,32 +894,57 @@
             }
 
             const fragPlayer = document.createDocumentFragment();
-            const fragFull = document.createDocumentFragment();
-
             channelsData.forEach((ch, idx) => {
-                const makeRow = () => {
-                    const row = document.createElement('div');
-                    row.className = 'channel-row-item';
-                    row.id = `ch-row-${idx}`;
-                    row.innerHTML = `
-                        <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/40?text=TV'">
-                        <div class="channel-row-info">
-                            <h4>${ch.name}</h4>
-                            <span>${ch.group}</span>
-                        </div>
-                    `;
-                    row.onclick = () => {
-                        navigateTo('screenPlayer', idx);
-                    };
-                    return row;
-                };
-
-                fragPlayer.appendChild(makeRow());
-                fragFull.appendChild(makeRow());
+                const row = document.createElement('div');
+                row.className = 'channel-row-item';
+                row.id = `ch-row-${idx}`;
+                row.innerHTML = `
+                    <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/40?text=TV'">
+                    <div class="channel-row-info">
+                        <h4>${ch.name}</h4>
+                        <span>${ch.group}</span>
+                    </div>
+                `;
+                row.onclick = () => navigateTo('screenPlayer', idx);
+                fragPlayer.appendChild(row);
             });
-
             channelsListBox.appendChild(fragPlayer);
-            fullChannelsListBox.appendChild(fragFull);
+        }
+
+        function renderChannelsList(listToRender, container) {
+            container.innerHTML = '';
+            if (listToRender.length === 0) {
+                container.innerHTML = `<div style="text-align:center; color:#94a3b8; padding:30px; font-size:12px;">لا توجد نتائج مطابقة للبحث</div>`;
+                return;
+            }
+
+            const frag = document.createDocumentFragment();
+            listToRender.forEach((ch) => {
+                let originalIdx = channelsData.findIndex(c => c.url === ch.url);
+                const row = document.createElement('div');
+                row.className = 'channel-row-item';
+                row.innerHTML = `
+                    <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/40?text=TV'">
+                    <div class="channel-row-info">
+                        <h4>${ch.name}</h4>
+                        <span>${ch.group}</span>
+                    </div>
+                `;
+                row.onclick = () => navigateTo('screenPlayer', originalIdx);
+                frag.appendChild(row);
+            });
+            container.appendChild(frag);
+        }
+
+        // دالة البحث الفوري
+        function filterChannels(query) {
+            const term = query.trim().toLowerCase();
+            if (!term) {
+                renderChannelsList(channelsData, fullChannelsListBox);
+                return;
+            }
+            const filtered = channelsData.filter(ch => ch.name.toLowerCase().includes(term) || ch.group.toLowerCase().includes(term));
+            renderChannelsList(filtered, fullChannelsListBox);
         }
 
         function playChannel(index) {
@@ -904,7 +978,7 @@
                         playerWrapper.classList.remove('is-loading');
                     }).catch(e => console.log("Autoplay restricted"));
                     updatePlayIcon(true);
-                    resetControlsTimer(); // بدء مؤقت الإخفاء التلقائي عند تشغيل القناة
+                    resetControlsTimer();
                 });
                 hlsInstance.on(Hls.Events.ERROR, (evt, data) => {
                     if (data.fatal) {
@@ -1020,16 +1094,13 @@
             }
         }
 
-        // نظام التحكم الاحترافي في إظهار وإخفاء الأزرار عند الضغط التلقائي أو بعد 3 ثوانٍ
         let hideTimer = null;
 
         function togglePlayerControls() {
             if (playerWrapper.classList.contains('controls-visible')) {
-                // إذا كانت ظاهرة وأراد المستخدم إخفاءها بالنقر
                 playerWrapper.classList.remove('controls-visible');
                 clearTimeout(hideTimer);
             } else {
-                // إذا كانت مخفية وأراد إظهارها
                 playerWrapper.classList.add('controls-visible');
                 resetControlsTimer();
             }
@@ -1039,7 +1110,6 @@
             clearTimeout(hideTimer);
             playerWrapper.classList.add('controls-visible');
             
-            // إخفاء الأزرار تلقائياً بعد 3 ثوانٍ
             hideTimer = setTimeout(() => {
                 if (!video.paused) {
                     playerWrapper.classList.remove('controls-visible');
