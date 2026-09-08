@@ -289,7 +289,13 @@
             width: 100% !important;
             height: 100% !important;
             background-color: #000 !important;
-            direction: ltr !important; /* ضمان اتجاه أزرار التحكم الافتراضية */
+            direction: ltr !important;
+        }
+
+        /* تخصيص المشغل عند وضع الشاشة الكاملة لتغطية الأبعاد أفقياً */
+        .video-js.vjs-fullscreen {
+            width: 100vw !important;
+            height: 100vh !important;
         }
 
         /* شريط معلومات القناة */
@@ -461,7 +467,6 @@
         <!-- 2. المشغل -->
         <div class="app-screen" id="screenPlayer">
             <div class="player-wrapper">
-                <!-- عنصر Video.js مع أدوات التحكم الافتراضية تفعيل (controls: true) -->
                 <video id="mainVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls playsinline webkit-playsinline></video>
             </div>
 
@@ -566,16 +571,19 @@
             return channelTranslations[originalName] || originalName;
         }
 
-        // 1. تهيئة Video.js الافتراضية كلياً
+        // 1. تهيئة Video.js والتحكم في الشاشة الكاملة
         function initVideoJS() {
             vjsPlayer = videojs('mainVideo', {
-                controls: true, // تفعيل واجهة وأزرار Video.js الرسمية
+                controls: true,
                 autoplay: false,
                 preload: 'auto',
                 responsive: true,
                 fluid: false,
                 html5: {
-                    vhs: { overrideNative: true },
+                    vhs: { 
+                        overrideNative: true,
+                        withCredentials: false
+                    },
                     nativeAudioTracks: false,
                     nativeVideoTracks: false
                 }
@@ -584,6 +592,23 @@
             if (vjsPlayer.eme) {
                 vjsPlayer.eme();
             }
+
+            // ميزة الشاشة الكاملة الأفقية 
+            vjsPlayer.on('fullscreenchange', () => {
+                if (vjsPlayer.isFullscreen()) {
+                    if (screen.orientation && screen.orientation.lock) {
+                        screen.orientation.lock('landscape').catch(() => {});
+                    } else if (screen.lockOrientation) {
+                        screen.lockOrientation('landscape');
+                    }
+                } else {
+                    if (screen.orientation && screen.orientation.unlock) {
+                        screen.orientation.unlock();
+                    } else if (screen.unlockOrientation) {
+                        screen.unlockOrientation();
+                    }
+                }
+            });
 
             vjsPlayer.on('error', () => {
                 console.error("Video.js Error:", vjsPlayer.error());
@@ -736,12 +761,14 @@
             renderChannelsList(filtered, fullChannelsListBox);
         }
 
-        // 2. دالة تشغيل القنوات وتصفير المشغل
+        // 2. دالة تشغيل القنوات وتمرير الروابط بشكل صحيح لـ HLS
         async function playChannel(index) {
             const ch = channelsData[index];
             if (!ch || !vjsPlayer) return;
 
-            // تصفير وإعادة تعيين المشغل
+            // إيقاف وتصفير المشغل بالكامل
+            vjsPlayer.pause();
+            vjsPlayer.currentTime(0);
             vjsPlayer.reset();
 
             document.querySelectorAll('.channel-row-item').forEach(el => el.classList.remove('active'));
@@ -755,12 +782,14 @@
             currentLogo.src = ch.logo;
 
             let streamUrl = ch.url;
-            if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
+
+            // توجيه جميع روابط hls الحية عبر البروكسي لتفادي حظر CORS و Mix Content
+            if (streamUrl.includes('.m3u8') || streamUrl.startsWith('http://')) {
                 streamUrl = corsProxy + encodeURIComponent(streamUrl);
             }
 
             let sourceType = 'application/x-mpegURL';
-            if (streamUrl.includes('.mpd')) {
+            if (ch.url.includes('.mpd')) {
                 sourceType = 'application/dash+xml';
             }
 
@@ -785,7 +814,14 @@
             vjsPlayer.src(srcOptions);
             
             vjsPlayer.ready(() => {
-                vjsPlayer.play().catch(() => {});
+                let playPromise = vjsPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {
+                        // كتم الصوت تلقائياً لتخطي سياسات المتصفح للتشغيل التلقائي
+                        vjsPlayer.muted(true);
+                        vjsPlayer.play();
+                    });
+                }
             });
         }
 
