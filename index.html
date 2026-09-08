@@ -120,7 +120,8 @@
             display: none;
             flex-direction: column;
             background: #07090e;
-            padding-bottom: 75px;
+            /* إضافة مساحة آمنة كافية أسفل الشاشة حتى لا يختفي أي زر خلف الشريط السفلي */
+            padding-bottom: 90px;
         }
 
         .app-screen.active {
@@ -264,7 +265,6 @@
             flex-shrink: 0;
         }
 
-        /* في وضع الشاشة الكاملة، اجخذ المشغل المساحة الكاملة بالشكل الأفقي */
         .sadeem-container:fullscreen .player-wrapper {
             height: 100vh !important;
             height: 100dvh !important;
@@ -438,7 +438,7 @@
 
         .sadeem-container:fullscreen .current-info-bar,
         .sadeem-container:-webkit-full-screen .current-info-bar {
-            display: none !important; /* إخفاء معلومات القناة في وضع الشاشة الكاملة لتوفير مساحة أفقية نقية */
+            display: none !important;
         }
 
         .current-info-bar img {
@@ -546,7 +546,7 @@
 
         .sadeem-container:fullscreen .sadeem-bottom-nav,
         .sadeem-container:-webkit-full-screen .sadeem-bottom-nav {
-            display: none !important; /* إخفاء شريط التنقل السفلي تلقائياً في الشاشة الكاملة الأفقية */
+            display: none !important;
         }
 
         .nav-btn {
@@ -624,7 +624,6 @@
                             <span class="time-txt" id="timeTxt">بث مباشر</span>
                         </div>
                         <div class="flex-group">
-                            <!-- زر الشاشة الكاملة المباشر والآمن -->
                             <button class="c-btn" id="fullscreenBtn" onclick="handleFullscreen(event)">
                                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                             </button>
@@ -956,14 +955,11 @@
             video.muted = !video.muted;
         }
 
-        // دالة الشاشة الكاملة المحسنة والموثوقة للمتصفحات
         function handleFullscreen(e) {
             e.stopPropagation();
-            
             const isFull = document.fullscreenElement || document.webkitFullscreenElement;
 
             if (!isFull) {
-                // تفعيل الشاشة الكاملة للحاوية الرئيسية
                 if (sadeemContainer.requestFullscreen) {
                     sadeemContainer.requestFullscreen().then(() => {
                         tryRotateLandscape();
@@ -974,17 +970,14 @@
                     sadeemContainer.webkitRequestFullscreen();
                     tryRotateLandscape();
                 } else if (video.webkitEnterFullscreen) {
-                    // دعم احتياطي لأجهزة آبل آيفون (iOS)
                     video.webkitEnterFullscreen();
                 }
             } else {
-                // الخروج من الشاشة الكاملة
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
                 }
-                // إعادة الوضع الطبيعي للشاشة
                 if (screen.orientation && screen.orientation.unlock) {
                     screen.orientation.unlock().catch(() => {});
                 }
@@ -994,7 +987,7 @@
         function tryRotateLandscape() {
             if (screen.orientation && screen.orientation.lock) {
                 screen.orientation.lock('landscape').catch((err) => {
-                    console.log("Landscape lock not supported or restricted:", err);
+                    console.log("Landscape lock not supported:", err);
                 });
             }
         }
