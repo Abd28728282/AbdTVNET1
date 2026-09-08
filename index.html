@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- منع إرسال GitHub Pages كـ Referer لمنع حظر السيرفرات -->
+    <meta name="referrer" content="no-referrer" />
     <title>سديم تي في | Video.js Native</title>
     
     <!-- مكتبة Video.js وإضافة DRM (EME) -->
@@ -292,7 +294,6 @@
             direction: ltr !important;
         }
 
-        /* تخصيص المشغل عند وضع الشاشة الكاملة لتغطية الأبعاد أفقياً */
         .video-js.vjs-fullscreen {
             width: 100vw !important;
             height: 100vh !important;
@@ -532,7 +533,8 @@
         let channelsData = [];
         let groupedData = {};
 
-        const corsProxy = "https://corsproxy.io/?";
+        // رابط البروكسي العام لمعالجة قيود CORS على GitHub Pages
+        const PROXY_URL = "https://corsproxy.io/?";
 
         const groupTranslations = {
             "News": "الأخبار",
@@ -571,8 +573,16 @@
             return channelTranslations[originalName] || originalName;
         }
 
-        // 1. تهيئة Video.js والتحكم في الشاشة الكاملة
+        // 1. تهيئة Video.js مع المعالج الديناميكي لطلبات HLS
         function initVideoJS() {
+            // إعداد محول الطلبات (XHR) لتمرير جميع أجزاء الفيديو (.ts / .m3u8) عبر البروكسي عند التشغيل على GitHub Pages
+            videojs.HlsHandler.xhr.beforeRequest = function(options) {
+                if (window.location.protocol === 'https:' && options.uri && !options.uri.includes('corsproxy.io')) {
+                    options.uri = PROXY_URL + encodeURIComponent(options.uri);
+                }
+                return options;
+            };
+
             vjsPlayer = videojs('mainVideo', {
                 controls: true,
                 autoplay: false,
@@ -593,7 +603,7 @@
                 vjsPlayer.eme();
             }
 
-            // ميزة الشاشة الكاملة الأفقية 
+            // الشاشة الكاملة الأفقية 
             vjsPlayer.on('fullscreenchange', () => {
                 if (vjsPlayer.isFullscreen()) {
                     if (screen.orientation && screen.orientation.lock) {
@@ -638,7 +648,12 @@
 
         async function fetchChannels() {
             try {
-                const res = await fetch('https://iptv-org.github.io/iptv/languages/ara.m3u');
+                let playlistUrl = 'https://iptv-org.github.io/iptv/languages/ara.m3u';
+                // إذا كنا على HTTPS نمرر طلب القائمة أيضاً عبر البروكسي
+                if (window.location.protocol === 'https:') {
+                    playlistUrl = PROXY_URL + encodeURIComponent(playlistUrl);
+                }
+                const res = await fetch(playlistUrl);
                 const text = await res.text();
                 parsePlaylist(text);
             } catch (e) {
@@ -761,12 +776,11 @@
             renderChannelsList(filtered, fullChannelsListBox);
         }
 
-        // 2. دالة تشغيل القنوات وتمرير الروابط بشكل صحيح لـ HLS
+        // 2. دالة تشغيل القناة المؤكدة
         async function playChannel(index) {
             const ch = channelsData[index];
             if (!ch || !vjsPlayer) return;
 
-            // إيقاف وتصفير المشغل بالكامل
             vjsPlayer.pause();
             vjsPlayer.currentTime(0);
             vjsPlayer.reset();
@@ -783,9 +797,9 @@
 
             let streamUrl = ch.url;
 
-            // توجيه جميع روابط hls الحية عبر البروكسي لتفادي حظر CORS و Mix Content
-            if (streamUrl.includes('.m3u8') || streamUrl.startsWith('http://')) {
-                streamUrl = corsProxy + encodeURIComponent(streamUrl);
+            // توجيه الرابط الأولي عبر البروكسي عند استضافة الموقع على https (مثل GitHub Pages)
+            if (window.location.protocol === 'https:') {
+                streamUrl = PROXY_URL + encodeURIComponent(streamUrl);
             }
 
             let sourceType = 'application/x-mpegURL';
@@ -817,7 +831,6 @@
                 let playPromise = vjsPlayer.play();
                 if (playPromise !== undefined) {
                     playPromise.catch(() => {
-                        // كتم الصوت تلقائياً لتخطي سياسات المتصفح للتشغيل التلقائي
                         vjsPlayer.muted(true);
                         vjsPlayer.play();
                     });
