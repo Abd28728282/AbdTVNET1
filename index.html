@@ -30,7 +30,7 @@
             overflow-x: hidden;
         }
 
-        /* حاوية الهاتف الأساسية */
+        /* حاوية الهاتف الأساسية (عند ملء الشاشة ستتمدد بشكل فخم تحافظ على كل التصميم) */
         .mobile-frame {
             width: 100%;
             max-width: 480px;
@@ -41,6 +41,22 @@
             flex-direction: column;
             overflow: hidden;
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.8);
+        }
+
+        /* إذا دخلت الحاوية في وضع ملء الشاشة، تجعل الخلفية سوداء سينمائية وتوسّط المحتوى */
+        .mobile-frame:fullscreen {
+            max-width: 100% !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
+            background-color: #0b0f19;
+        }
+        .mobile-frame:-webkit-full-screen {
+            max-width: 100% !important;
+            height: 100vh !important;
+            border-radius: 0 !important;
+            border: none !important;
+            background-color: #0b0f19;
         }
 
         @media (min-width: 481px) {
@@ -252,13 +268,21 @@
             justify-content: center;
         }
 
+        /* في وضع ملء الشاشة للحاوية، نكبر مساحة المشغل لتملاء الشاشة بانسجام */
+        .mobile-frame:fullscreen .mobile-video-container {
+            height: 45vh;
+        }
+        .mobile-frame:-webkit-full-screen .mobile-video-container {
+            height: 45vh;
+        }
+
         .mobile-video-container video {
             width: 100%;
             height: 100%;
             object-fit: contain;
         }
 
-        /* لوحة التحكم الخاصة بالمشغل (تظهر عند اللمس) */
+        /* لوحة التحكم الخاصة بالمشغل */
         .custom-video-controls {
             position: absolute;
             bottom: 0;
@@ -280,7 +304,7 @@
             pointer-events: auto;
         }
 
-        /* شريط التخزين المؤقت والتقدم (Seekbar & Buffer Bar) */
+        /* شريط التخزين المؤقت والتقدم (Seekbar & Buffer Bar) من اليسار لليمين تماماً */
         .seekbar-wrapper {
             position: relative;
             width: 100%;
@@ -288,6 +312,7 @@
             display: flex;
             align-items: center;
             cursor: pointer;
+            direction: ltr; /* لضمان التعبئة تبدأ من اليسار إلى اليمين */
         }
 
         .seekbar-bg {
@@ -299,11 +324,11 @@
             overflow: hidden;
         }
 
-        /* شريط التحميل/التخزين المؤقت (Buffer Bar) */
+        /* شريط التخزين المؤقت (Buffer Bar) يبدأ من اليسار */
         .buffer-bar {
             position: absolute;
             top: 0;
-            right: 0;
+            left: 0;
             height: 100%;
             background: rgba(255, 255, 255, 0.4);
             width: 0%;
@@ -311,11 +336,11 @@
             transition: width 0.2s ease;
         }
 
-        /* شريط التقدم الفعلي */
+        /* شريط التقدم الفعلي يبدأ من اليسار إلى اليمين */
         .progress-bar {
             position: absolute;
             top: 0;
-            right: 0;
+            left: 0;
             height: 100%;
             background: #38bdf8;
             width: 0%;
@@ -325,12 +350,12 @@
         /* كرة التحكم بالسحب على الشريط */
         .seekbar-thumb {
             position: absolute;
-            right: 0%;
+            left: 0%;
             width: 11px;
             height: 11px;
             background: #fff;
             border-radius: 50%;
-            transform: translateX(50%);
+            transform: translateX(-50%);
             box-shadow: 0 0 6px rgba(0,0,0,0.5);
         }
 
@@ -377,6 +402,7 @@
             font-size: 10px;
             color: #cbd5e1;
             font-weight: 600;
+            direction: ltr;
         }
 
         .current-playing-card {
@@ -420,6 +446,14 @@
             display: flex;
             flex-direction: column;
             gap: 10px;
+        }
+
+        /* في وضع ملء الشاشة للحاوية، نمنح القائمة مساحة أكبر للتصفح */
+        .mobile-frame:fullscreen .vertical-playlist {
+            max-height: calc(55vh - 70px);
+        }
+        .mobile-frame:-webkit-full-screen .vertical-playlist {
+            max-height: calc(55vh - 70px);
         }
 
         .playlist-item {
@@ -517,7 +551,8 @@
 </head>
 <body>
 
-    <div class="mobile-frame">
+    <!-- حاوية الهاتف الأساسية (التي ستدخل بالكامل في وضع ملء الشاشة) -->
+    <div class="mobile-frame" id="mobileFrame">
         
         <!-- شريط علوي -->
         <div class="mobile-header">
@@ -544,10 +579,10 @@
             <div class="mobile-video-container" id="videoContainer" onclick="toggleControls()">
                 <video id="customVideo" playsinline webkit-playsinline></video>
                 
-                <!-- لوحة التحكم الاحترافية مع الرموز الحقيقية وSeekBar المؤقت -->
+                <!-- لوحة التحكم الاحترافية مع SeekBar من اليسار لليمين -->
                 <div class="custom-video-controls" id="videoControls">
                     
-                    <!-- شريط التقدم والتخزين المؤقت (Seekbar & Buffer) -->
+                    <!-- شريط التقدم والتخزين المؤقت (من اليسار لليمين) -->
                     <div class="seekbar-wrapper" id="seekbarWrapper">
                         <div class="seekbar-bg">
                             <div class="buffer-bar" id="bufferBar"></div>
@@ -559,11 +594,11 @@
                     <!-- أزرار التحكم -->
                     <div class="controls-row">
                         <div class="controls-group-right">
-                            <!-- زر التشغيل / الإيقاف (رمز SVG حقيقي بدلاً من الايموجي) -->
+                            <!-- زر التشغيل / الإيقاف -->
                             <button class="ctrl-btn" id="playPauseBtn" onclick="togglePlayPause(event)">
                                 <svg id="playPauseIcon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
                             </button>
-                            <!-- زر كتم الصوت (رمز SVG حقيقي) -->
+                            <!-- زر كتم الصوت -->
                             <button class="ctrl-btn" onclick="toggleMute(event)">
                                 <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
                             </button>
@@ -571,7 +606,7 @@
                         </div>
 
                         <div class="controls-group-left">
-                            <!-- زر ملء الشاشة (رمز SVG حقيقي) -->
+                            <!-- زر ملء الشاشة (يكبر الحاوية بالكامل ليحافظ على التصميم) -->
                             <button class="ctrl-btn" onclick="toggleFullscreen(event)">
                                 <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
                             </button>
@@ -610,7 +645,7 @@
     <script>
         const video = document.getElementById('customVideo');
         const videoContainer = document.getElementById('videoContainer');
-        const videoControls = document.getElementById('videoControls');
+        const mobileFrame = document.getElementById('mobileFrame');
         const playPauseIcon = document.getElementById('playPauseIcon');
         const progressBar = document.getElementById('progressBar');
         const bufferBar = document.getElementById('bufferBar');
@@ -776,7 +811,7 @@
             }
         }
 
-        // تحديث شريط التقدم والتخزين المؤقت (Buffer & Progress)
+        // تحديث شريط التقدم والتخزين المؤقت (من اليسار لليمين)
         video.addEventListener('timeupdate', () => {
             if (!video.duration) return;
             const current = video.currentTime;
@@ -786,13 +821,11 @@
             progressBar.style.width = percent + '%';
             seekbarThumb.style.left = percent + '%';
 
-            // حساب الوقت المنقضي
             let m = Math.floor(current / 60);
             let s = Math.floor(current % 60);
             timeDisplay.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
         });
 
-        // تحديث نسبة التخزين المؤقت (Buffer Bar)
         video.addEventListener('progress', () => {
             if (video.buffered.length > 0 && video.duration > 0) {
                 const bufferedEnd = video.buffered.end(video.buffered.length - 1);
@@ -814,10 +847,8 @@
 
         function updatePlayPauseIcon(isPlaying) {
             if (isPlaying) {
-                // رمز إيقاف مؤقت SVG (Pause)
                 playPauseIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
             } else {
-                // رمز تشغيل SVG (Play)
                 playPauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
             }
         }
@@ -827,12 +858,21 @@
             video.muted = !video.muted;
         }
 
+        // تفعيل وضع ملء الشاشة للحاوية كاملة ليبقى التصميم الأسطوري والمشغل مظبوطين تماماً
         function toggleFullscreen(e) {
             e.stopPropagation();
-            if (video.requestFullscreen) {
-                video.requestFullscreen();
-            } else if (video.webkitEnterFullscreen) {
-                video.webkitEnterFullscreen();
+            if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                if (mobileFrame.requestFullscreen) {
+                    mobileFrame.requestFullscreen();
+                } else if (mobileFrame.webkitRequestFullscreen) {
+                    mobileFrame.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
             }
         }
 
