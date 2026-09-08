@@ -45,17 +45,28 @@
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
         }
 
+        /* تحسين وضع الشاشة الكاملة لتكون أفقية تلقائياً وبملء الشاشة الفعلي */
         .sadeem-container:fullscreen {
-            max-width: 100% !important;
+            max-width: 100vw !important;
             width: 100vw !important;
             height: 100vh !important;
+            height: 100dvh !important;
             border-radius: 0 !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 99999 !important;
         }
         .sadeem-container:-webkit-full-screen {
-            max-width: 100% !important;
+            max-width: 100vw !important;
             width: 100vw !important;
             height: 100vh !important;
+            height: 100dvh !important;
             border-radius: 0 !important;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            z-index: 99999 !important;
         }
 
         @media (min-width: 481px) {
@@ -109,7 +120,7 @@
             display: none;
             flex-direction: column;
             background: #07090e;
-            padding-bottom: 75px; /* مساحة لعدم تداخل المحتوى مع شريط التنقل السفلي */
+            padding-bottom: 75px;
         }
 
         .app-screen.active {
@@ -253,17 +264,45 @@
             flex-shrink: 0;
         }
 
+        /* في وضع الشاشة الكاملة، اجعل المشغل يأخذ المساحة الكاملة بالشكل الأفقي الرائع */
         .sadeem-container:fullscreen .player-wrapper {
-            height: 50vh;
+            height: 100vh !important;
+            height: 100dvh !important;
+            flex: 1;
         }
         .sadeem-container:-webkit-full-screen .player-wrapper {
-            height: 50vh;
+            height: 100vh !important;
+            height: 100dvh !important;
+            flex: 1;
         }
 
         .player-wrapper video {
             width: 100%;
             height: 100%;
             object-fit: contain;
+        }
+
+        /* البروجرس بار الدائري في منتصف المشغل */
+        .circular-loader {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(56, 189, 248, 0.2);
+            border-top: 4px solid #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+            z-index: 25;
+            pointer-events: none;
+        }
+
+        .player-wrapper.is-loading .circular-loader {
+            display: block;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
 
         /* أزرار التحكم بالمشغل */
@@ -280,6 +319,7 @@
             opacity: 0;
             transition: opacity 0.3s ease;
             pointer-events: none;
+            z-index: 30;
         }
 
         .player-wrapper:hover .player-controls,
@@ -288,7 +328,7 @@
             pointer-events: auto;
         }
 
-        /* شريط التقدم من اليسار لليمين بدقة */
+        /* شريط التقدم الخطي */
         .seekbar-box {
             position: relative;
             width: 100%;
@@ -396,6 +436,11 @@
             flex-shrink: 0;
         }
 
+        .sadeem-container:fullscreen .current-info-bar,
+        .sadeem-container:-webkit-full-screen .current-info-bar {
+            display: none !important; /* إخفاء معلومات القناة في وضع الشاشة الكاملة لتوفير مساحة أفقية نقية للفيديو */
+        }
+
         .current-info-bar img {
             width: 42px;
             height: 42px;
@@ -499,6 +544,11 @@
             z-index: 1000;
         }
 
+        .sadeem-container:fullscreen .sadeem-bottom-nav,
+        .sadeem-container:-webkit-full-screen .sadeem-bottom-nav {
+            display: none !important; /* إخفاء شريط التنقل السفلي تلقائياً في الشاشة الكاملة الأفقية */
+        }
+
         .nav-btn {
             background: none;
             border: none;
@@ -551,6 +601,7 @@
         <!-- 2. شاشة المشغل -->
         <div class="app-screen" id="screenPlayer">
             <div class="player-wrapper" id="playerWrapper" onclick="togglePlayerControls()">
+                <div class="circular-loader" id="circularLoader"></div>
                 <video id="mainVideo" playsinline webkit-playsinline></video>
                 
                 <div class="player-controls" id="playerControls">
@@ -619,6 +670,7 @@
     <script>
         const video = document.getElementById('mainVideo');
         const playerWrapper = document.getElementById('playerWrapper');
+        const circularLoader = document.getElementById('circularLoader');
         const sadeemContainer = document.getElementById('sadeemContainer');
         const playPauseIcon = document.getElementById('playPauseIcon');
         const playProgress = document.getElementById('playProgress');
@@ -812,6 +864,7 @@
 
             currentTitle.textContent = ch.name;
             currentLogo.src = ch.logo;
+            playerWrapper.classList.add('is-loading');
 
             if (Hls.isSupported()) {
                 if (hlsInstance) hlsInstance.destroy();
@@ -824,22 +877,37 @@
                 hlsInstance.loadSource(ch.url);
                 hlsInstance.attachMedia(video);
                 hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-                    video.play().catch(e => console.log("Autoplay restricted"));
+                    video.play().then(() => {
+                        playerWrapper.classList.remove('is-loading');
+                    }).catch(e => console.log("Autoplay restricted"));
                     updatePlayIcon(true);
                 });
                 hlsInstance.on(Hls.Events.ERROR, (evt, data) => {
                     if (data.fatal) {
                         if (data.type === Hls.ErrorTypes.NETWORK_ERROR) hlsInstance.startLoad();
                         else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) hlsInstance.recoverMediaError();
-                        else hlsInstance.destroy();
+                        else {
+                            hlsInstance.destroy();
+                            playerWrapper.classList.remove('is-loading');
+                        }
                     }
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = ch.url;
-                video.play();
+                video.play().then(() => {
+                    playerWrapper.classList.remove('is-loading');
+                });
                 updatePlayIcon(true);
             }
         }
+
+        video.addEventListener('waiting', () => {
+            playerWrapper.classList.add('is-loading');
+        });
+
+        video.addEventListener('playing', () => {
+            playerWrapper.classList.remove('is-loading');
+        });
 
         video.addEventListener('timeupdate', () => {
             if (!video.duration) return;
@@ -889,12 +957,24 @@
 
         function handleFullscreen(e) {
             e.stopPropagation();
+            
+            // محاولة توجيه الشاشة أفقياً تلقائياً إذا دعم المتصفح خاصية Screen Orientation API
+            if (screen.orientation && screen.orientation.lock) {
+                screen.orientation.lock('landscape').catch(() => {});
+            }
+
             if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-                if (sadeemContainer.requestFullscreen) sadeemContainer.requestFullscreen();
-                else if (sadeemContainer.webkitRequestFullscreen) sadeemContainer.webkitRequestFullscreen();
+                if (sadeemContainer.requestFullscreen) {
+                    sadeemContainer.requestFullscreen();
+                } else if (sadeemContainer.webkitRequestFullscreen) {
+                    sadeemContainer.webkitRequestFullscreen();
+                }
             } else {
-                if (document.exitFullscreen) document.exitFullscreen();
-                else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
             }
         }
 
