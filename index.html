@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- منع إرسال Referer لمنع حظر القنوات -->
     <meta name="referrer" content="no-referrer" />
-    <title>سديم تي في</title>
+    <title>سديم تي في | Abd TV</title>
     
-    <!-- مكتبة Video.js -->
+    <!-- مكتبة Video.js الرسمية مع دعم EME/DRM -->
     <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
     <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-eme@5.3.0/dist/videojs-contrib-eme.min.js"></script>
+    
     <!-- خط Cairo -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 
@@ -35,6 +37,7 @@
             overflow: hidden;
         }
 
+        /* حاوية التطبيق للجوال والجهاز */
         .sadeem-container {
             width: 100%;
             max-width: 480px;
@@ -57,6 +60,7 @@
             }
         }
 
+        /* الشريط العلوي */
         .sadeem-header {
             height: 60px;
             min-height: 60px;
@@ -90,6 +94,7 @@
             border-radius: 4px;
         }
 
+        /* الشاشات والتنقّلات */
         .app-screen {
             flex: 1;
             width: 100%;
@@ -104,6 +109,7 @@
             display: flex;
         }
 
+        /* البانر الترحيبي */
         .hero-banner-box {
             padding: 16px;
             flex-shrink: 0;
@@ -116,6 +122,8 @@
             display: flex;
             flex-direction: column;
             align-items: flex-start;
+            position: relative;
+            overflow: hidden;
             box-shadow: 0 10px 25px rgba(2, 132, 199, 0.3);
         }
 
@@ -124,12 +132,14 @@
             font-weight: 900;
             color: #fff;
             margin-bottom: 6px;
+            line-height: 1.3;
         }
 
         .hero-banner p {
             font-size: 11px;
             color: #e0f2fe;
             margin-bottom: 16px;
+            line-height: 1.4;
         }
 
         .sadeem-btn {
@@ -141,11 +151,39 @@
             font-weight: 800;
             border-radius: 8px;
             cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
 
+        .sadeem-btn:active {
+            transform: scale(0.95);
+            background: #f1f5f9;
+        }
+
+        /* حقل البحث والمستدخلات */
         .search-box-container {
             padding: 0 16px 12px;
             flex-shrink: 0;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-input-wrapper svg {
+            position: absolute;
+            right: 14px;
+            width: 18px;
+            height: 18px;
+            fill: #94a3b8;
+            pointer-events: none;
         }
 
         .search-input {
@@ -153,11 +191,20 @@
             background: #111827;
             border: 1px solid rgba(255,255,255,0.08);
             border-radius: 12px;
-            padding: 11px 16px;
+            padding: 11px 42px 11px 16px;
             color: #fff;
             font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
         }
 
+        .search-input:focus {
+            border-color: #38bdf8;
+            background: #0f172a;
+            box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
+        }
+
+        /* عناوين الأقسام والقوائم */
         .section-title {
             padding: 0 16px;
             font-size: 14px;
@@ -182,9 +229,12 @@
             gap: 12px;
             overflow-x: auto;
             padding: 0 16px 15px;
+            scroll-behavior: smooth;
         }
 
-        .horizontal-list::-webkit-scrollbar { display: none; }
+        .horizontal-list::-webkit-scrollbar {
+            display: none;
+        }
 
         .media-card {
             min-width: 120px;
@@ -197,6 +247,13 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
+            transition: 0.2s;
+            flex-shrink: 0;
+        }
+
+        .media-card:active {
+            transform: scale(0.93);
+            background: #1f2937;
         }
 
         .media-card img {
@@ -213,13 +270,14 @@
             font-size: 11px;
             font-weight: 700;
             color: #e2e8f0;
+            width: 100%;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: 100%;
         }
 
+        /* مشغل الفيديو */
         .player-wrapper {
             width: 100%;
             height: 250px;
@@ -231,8 +289,11 @@
         .video-js {
             width: 100% !important;
             height: 100% !important;
+            background-color: #000 !important;
+            direction: ltr !important;
         }
 
+        /* شريط القناة المشغلة حالياً */
         .current-info-bar {
             padding: 12px 16px;
             background: #111827;
@@ -252,6 +313,22 @@
             padding: 4px;
         }
 
+        .current-meta h3 {
+            font-size: 13px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .current-meta span {
+            font-size: 10px;
+            color: #38bdf8;
+            background: rgba(56, 189, 248, 0.15);
+            padding: 2px 8px;
+            border-radius: 6px;
+        }
+
+        /* قائمة القنوات العمودية */
         .channels-list-box {
             flex: 1;
             overflow-y: auto;
@@ -270,6 +347,11 @@
             align-items: center;
             gap: 12px;
             cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .channel-row-item:active {
+            transform: scale(0.97);
         }
 
         .channel-row-item.active {
@@ -283,12 +365,21 @@
             object-fit: contain;
             background: #05070b;
             border-radius: 8px;
+            padding: 2px;
+        }
+
+        .channel-row-info {
+            flex: 1;
+            overflow: hidden;
         }
 
         .channel-row-info h4 {
             font-size: 12px;
             font-weight: 700;
             color: #fff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .channel-row-info span {
@@ -296,12 +387,14 @@
             color: #94a3b8;
         }
 
+        /* التنقل السفلي */
         .sadeem-bottom-nav {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             height: 65px;
+            min-height: 65px;
             background: rgba(7, 9, 14, 0.98);
             backdrop-filter: blur(20px);
             display: flex;
@@ -309,6 +402,7 @@
             align-items: center;
             border-top: 1px solid rgba(255,255,255,0.08);
             z-index: 1000;
+            flex-shrink: 0;
         }
 
         .nav-btn {
@@ -322,11 +416,8 @@
             align-items: center;
             gap: 3px;
             cursor: pointer;
+            transition: color 0.2s;
             flex: 1;
-        }
-
-        .nav-btn.active {
-            color: #38bdf8;
         }
 
         .nav-btn svg {
@@ -334,74 +425,126 @@
             height: 22px;
             fill: currentColor;
         }
+
+        .nav-btn.active {
+            color: #38bdf8;
+        }
     </style>
 </head>
 <body>
 
     <div class="sadeem-container">
+        
+        <!-- الهيدر -->
         <div class="sadeem-header">
-            <div class="sadeem-logo">سديم تي في <span>مباشر</span></div>
+            <div class="sadeem-logo">
+                سديم تي في <span>النسخة الكاملة</span>
+            </div>
         </div>
 
-        <!-- الرئيسية -->
+        <!-- 1. الشاشة الرئيسية -->
         <div class="app-screen active" id="screenHome">
             <div class="hero-banner-box">
                 <div class="hero-banner">
-                    <h1>البث المباشر الفضائي</h1>
-                    <p>تشغيل مباشر وسريع للقنوات العربية.</p>
-                    <button class="sadeem-btn" onclick="navigateTo('screenPlayer', 0)">▶ ابدأ المشاهدة</button>
+                    <h1>آفاق البث الفضائي المباشر</h1>
+                    <p>مشغل القنوات التفاعلي المتقدم مع الدليل الشامل وسرعة التحميل.</p>
+                    <button class="sadeem-btn" onclick="navigateTo('screenPlayer', 0)">▶ ابدأ المشاهدة الآن</button>
                 </div>
             </div>
             <div id="homeCategoriesContainer" style="padding-bottom: 75px;">
-                <div style="text-align: center; color: #94a3b8; padding: 40px; font-size: 13px;">جاري جلب قائمة القنوات...</div>
+                <div style="text-align: center; color: #94a3b8; padding: 40px; font-size: 13px;">جاري تحميل وسحب القنوات...</div>
             </div>
         </div>
 
-        <!-- المشغل -->
+        <!-- 2. شاشة المشغل -->
         <div class="app-screen" id="screenPlayer">
             <div class="player-wrapper">
                 <video id="mainVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls playsinline webkit-playsinline></video>
             </div>
+
             <div class="current-info-bar">
                 <img id="currentLogo" src="https://via.placeholder.com/40" onerror="this.src='https://via.placeholder.com/40?text=TV'">
-                <div>
-                    <h3 id="currentTitle" style="font-size:13px; color:#fff;">اختر قناة</h3>
-                    <span style="font-size:10px; color:#38bdf8;">بث حي</span>
+                <div class="current-meta">
+                    <h3 id="currentTitle">اختر قناة</h3>
+                    <span>بث مباشر حي</span>
                 </div>
             </div>
+
             <div class="channels-list-box" id="channelsListBox" style="padding-bottom: 75px;"></div>
         </div>
 
-        <!-- الدليل والبحث -->
+        <!-- 3. شاشة البحث والدليل الكامل -->
         <div class="app-screen" id="screenChannels">
-            <div class="search-box-container" style="padding-top: 15px;">
-                <input type="text" class="search-input" placeholder="ابحث عن اسم القناة..." oninput="filterChannels(this.value)">
+            <div style="padding: 15px 16px 5px; font-size: 15px; font-weight: 900; color: #fff;">دليل القنوات والبحث السريع</div>
+            
+            <div class="search-box-container" style="padding-top: 10px;">
+                <div class="search-input-wrapper">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="اكتب اسم القناة للبحث..." oninput="filterChannels(this.value)">
+                </div>
             </div>
+
             <div class="channels-list-box" id="fullChannelsListBox" style="padding-bottom: 75px;"></div>
         </div>
 
-        <!-- التنقل السفلي -->
+        <!-- أزرار التنقل السفلية -->
         <div class="sadeem-bottom-nav">
             <button class="nav-btn active" id="navHome" onclick="navigateTo('screenHome')">
-                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>الرئيسية
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                الرئيسية
             </button>
             <button class="nav-btn" id="navPlayer" onclick="navigateTo('screenPlayer')">
-                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>المشغل
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                المشغل
             </button>
             <button class="nav-btn" id="navChannels" onclick="navigateTo('screenChannels')">
-                <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>الدليل
+                <svg viewBox="0 0 24 24"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>
+                الدليل
             </button>
         </div>
+
     </div>
 
     <script>
+        const screenHome = document.getElementById('screenHome');
+        const screenPlayer = document.getElementById('screenPlayer');
+        const screenChannels = document.getElementById('screenChannels');
+        
+        const navHome = document.getElementById('navHome');
+        const navPlayer = document.getElementById('navPlayer');
+        const navChannels = document.getElementById('navChannels');
+
+        const homeCategoriesContainer = document.getElementById('homeCategoriesContainer');
+        const channelsListBox = document.getElementById('channelsListBox');
+        const fullChannelsListBox = document.getElementById('fullChannelsListBox');
+        const currentTitle = document.getElementById('currentTitle');
+        const currentLogo = document.getElementById('currentLogo');
+
         let vjsPlayer = null;
         let channelsData = [];
         let groupedData = {};
 
-        // بروكسي موثوق لتجاوز HTTPS و CORS على GitHub Pages
-        const PROXY = "https://api.allorigins.win/raw?url=";
+        // رابط بروكسي لتفادي قيود HTTPS و CORS على GitHub Pages
+        const PROXY_URL = "https://api.allorigins.win/raw?url=";
 
+        // ترجمة اسم الأقسام لضمان مظهر عربي كامل
+        const groupTranslations = {
+            "News": "الأخبار",
+            "Sports": "الرياضة",
+            "Movies": "الأفلام والسينما",
+            "Entertainment": "الترفيه",
+            "Documentary": "الوثائقية",
+            "Music": "الموسيقى",
+            "Kids": "أطفال",
+            "Religious": "الدينية",
+            "General": "عامة"
+        };
+
+        function translateGroup(g) {
+            return groupTranslations[g] || g;
+        }
+
+        // 1. تهيئة Video.js
         function initVideoJS() {
             vjsPlayer = videojs('mainVideo', {
                 controls: true,
@@ -409,87 +552,110 @@
                 preload: 'auto',
                 fluid: false
             });
+
+            if (vjsPlayer.eme) vjsPlayer.eme();
         }
 
-        async function fetchChannels() {
-            try {
-                // رابط قائمة القنوات العربية المباشر
-                const targetUrl = 'https://iptv-org.github.io/iptv/languages/ara.m3u';
-                const fetchUrl = window.location.protocol === 'https:' ? PROXY + encodeURIComponent(targetUrl) : targetUrl;
-                
-                const res = await fetch(fetchUrl);
-                const text = await res.text();
-                parseM3U(text);
-            } catch (e) {
-                document.getElementById('homeCategoriesContainer').innerHTML = 
-                    `<div style="text-align:center; padding:30px; color:#ef4444; font-size:12px;">حدث خطأ أثناء تحميل القنوات، أعد تحميل الصفحة.</div>`;
+        // 2. التنقل بين الشاشات
+        function navigateTo(screenId, targetIndex = null) {
+            [screenHome, screenPlayer, screenChannels].forEach(s => s.classList.remove('active'));
+            [navHome, navPlayer, navChannels].forEach(n => n.classList.remove('active'));
+
+            if (screenId === 'screenHome') {
+                screenHome.classList.add('active');
+                navHome.classList.add('active');
+            } else if (screenId === 'screenPlayer') {
+                screenPlayer.classList.add('active');
+                navPlayer.classList.add('active');
+                if (targetIndex !== null && channelsData[targetIndex]) {
+                    playChannel(targetIndex);
+                }
+            } else if (screenId === 'screenChannels') {
+                screenChannels.classList.add('active');
+                navChannels.classList.add('active');
             }
         }
 
-        function parseM3U(content) {
+        // 3. جلب وتجهيز قائمة القنوات
+        async function fetchChannels() {
+            try {
+                let playlistUrl = 'https://iptv-org.github.io/iptv/languages/ara.m3u';
+                if (window.location.protocol === 'https:') {
+                    playlistUrl = PROXY_URL + encodeURIComponent(playlistUrl);
+                }
+                const res = await fetch(playlistUrl);
+                const text = await res.text();
+                parsePlaylist(text);
+            } catch (e) {
+                homeCategoriesContainer.innerHTML = `<div style="text-align:center; color:#ef4444; padding:30px; font-size:12px;">خطأ في تحميل القنوات، تأكد من الاتصال بالإنترنت.</div>`;
+            }
+        }
+
+        function parsePlaylist(content) {
             const lines = content.split('\n');
             channelsData = [];
             groupedData = {};
-            let current = {};
+            let item = {};
 
             for (let i = 0; i < lines.length; i++) {
-                let line = lines[i].trim();
-                if (line.startsWith('#EXTINF:')) {
-                    let nameMatch = line.match(/,(.+)$/);
-                    let logoMatch = line.match(/tvg-logo="([^"]+)"/);
-                    let groupMatch = line.match(/group-title="([^"]+)"/);
+                let l = lines[i].trim();
+                if (l.startsWith('#EXTINF:')) {
+                    let nameM = l.match(/,(.+)$/);
+                    let logoM = l.match(/tvg-logo="([^"]+)"/);
+                    let groupM = l.match(/group-title="([^"]+)"/);
 
-                    current.name = nameMatch ? nameMatch[1].trim() : "قناة فضائية";
-                    current.logo = logoMatch ? logoMatch[1] : "https://via.placeholder.com/40?text=TV";
-                    current.group = groupMatch ? groupMatch[1] : "عامة";
-                } else if (line && !line.startsWith('#')) {
-                    current.url = line;
-                    if (current.name && current.url) {
-                        channelsData.push({ ...current });
-                        if (!groupedData[current.group]) groupedData[current.group] = [];
-                        groupedData[current.group].push({ ...current });
+                    item.name = nameM ? nameM[1].trim() : "قناة فضائية";
+                    item.logo = logoM ? logoM[1] : "https://via.placeholder.com/40?text=TV";
+                    
+                    let rawGroup = groupM ? groupM[1] : "عامة";
+                    item.group = translateGroup(rawGroup);
+                } else if (l && !l.startsWith('#')) {
+                    item.url = l;
+                    if (item.name && item.url) {
+                        channelsData.push({ ...item });
+                        if (!groupedData[item.group]) groupedData[item.group] = [];
+                        groupedData[item.group].push({ ...item });
                     }
-                    current = {};
+                    item = {};
                 }
             }
             renderUI();
         }
 
+        // 4. بناء الواجهة الرسومية كاملة
         function renderUI() {
-            const homeContainer = document.getElementById('homeCategoriesContainer');
-            const playerList = document.getElementById('channelsListBox');
-            const fullList = document.getElementById('fullChannelsListBox');
+            homeCategoriesContainer.innerHTML = '';
+            channelsListBox.innerHTML = '';
+            fullChannelsListBox.innerHTML = '';
 
-            homeContainer.innerHTML = '';
-            playerList.innerHTML = '';
-            fullList.innerHTML = '';
-
-            // 1. القوائم الأفقية في الرئيسية
+            // بناء أقسام الشاشة الرئيسية
             for (const [group, list] of Object.entries(groupedData)) {
                 let cardsHtml = '';
                 list.forEach(ch => {
-                    let index = channelsData.findIndex(c => c.url === ch.url);
+                    let realIdx = channelsData.findIndex(c => c.url === ch.url);
                     cardsHtml += `
-                        <div class="media-card" onclick="navigateTo('screenPlayer', ${index})">
+                        <div class="media-card" onclick="navigateTo('screenPlayer', ${realIdx})">
                             <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/40?text=TV'">
-                            <span>${ch.name}</span>
+                            <span title="${ch.name}">${ch.name}</span>
                         </div>
                     `;
                 });
 
-                homeContainer.innerHTML += `
-                    <div style="margin-bottom:15px;">
-                        <div class="section-title">${group}</div>
-                        <div class="horizontal-list">${cardsHtml}</div>
-                    </div>
+                const block = document.createElement('div');
+                block.style.marginBottom = "20px";
+                block.innerHTML = `
+                    <div class="section-title">${group}</div>
+                    <div class="horizontal-list">${cardsHtml}</div>
                 `;
+                homeCategoriesContainer.appendChild(block);
             }
 
-            // 2. القائمة العمودية في الشاشات الأخري
+            // بناء القائمة المباشرة في المشغل وقائمة البحث الكاملة
             channelsData.forEach((ch, idx) => {
                 const row = document.createElement('div');
                 row.className = 'channel-row-item';
-                row.id = `ch-${idx}`;
+                row.setAttribute('data-index', idx);
+                row.id = `ch-row-${idx}`;
                 row.innerHTML = `
                     <img src="${ch.logo}" onerror="this.src='https://via.placeholder.com/40?text=TV'">
                     <div class="channel-row-info">
@@ -497,59 +663,75 @@
                         <span>${ch.group}</span>
                     </div>
                 `;
+                // عند الضغط على القناة يتم الانتقال للمشغل وتشغيلها فوراً
                 row.onclick = () => navigateTo('screenPlayer', idx);
 
-                playerList.appendChild(row);
-                fullList.appendChild(row.cloneNode(true));
+                channelsListBox.appendChild(row);
+                fullChannelsListBox.appendChild(row.cloneNode(true));
+            });
+
+            // تفعيل دالة الضغط على القنوات داخل شاشة البحث بدقة
+            document.querySelectorAll('#fullChannelsListBox .channel-row-item').forEach(el => {
+                const idx = parseInt(el.getAttribute('data-index'));
+                el.onclick = () => navigateTo('screenPlayer', idx);
             });
         }
 
+        // 5. دالة البحث المصلحة والشغالة 100%
+        function filterChannels(query) {
+            const term = query.trim().toLowerCase();
+            const rows = fullChannelsListBox.querySelectorAll('.channel-row-item');
+
+            rows.forEach(row => {
+                const title = row.querySelector('h4').textContent.toLowerCase();
+                const group = row.querySelector('span').textContent.toLowerCase();
+
+                if (title.includes(term) || group.includes(term)) {
+                    row.style.display = 'flex';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        // 6. تشغيل القناة
         function playChannel(index) {
             const ch = channelsData[index];
             if (!ch || !vjsPlayer) return;
 
-            document.getElementById('currentTitle').textContent = ch.name;
-            document.getElementById('currentLogo').src = ch.logo;
+            vjsPlayer.pause();
 
-            let playUrl = ch.url;
-            // معالجة تشغيل الروابط غير الآمنة عبر البروكسي
-            if (window.location.protocol === 'https:' && playUrl.startsWith('http://')) {
-                playUrl = "https://corsproxy.io/?" + encodeURIComponent(playUrl);
+            // تحديث العناصر النشطة
+            document.querySelectorAll('.channel-row-item').forEach(el => el.classList.remove('active'));
+            const activeRow = document.getElementById(`ch-row-${index}`);
+            if (activeRow) {
+                activeRow.classList.add('active');
+                activeRow.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }
 
-            vjsPlayer.src({
-                src: playUrl,
-                type: 'application/x-mpegURL'
-            });
+            currentTitle.textContent = ch.name;
+            currentLogo.src = ch.logo;
 
-            vjsPlayer.ready(() => {
-                vjsPlayer.play().catch(() => {
-                    vjsPlayer.muted(true);
-                    vjsPlayer.play();
-                });
-            });
-        }
+            let streamUrl = ch.url;
+            if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
+                streamUrl = "https://corsproxy.io/?" + encodeURIComponent(streamUrl);
+            }
 
-        function navigateTo(screenId, index = null) {
-            ['screenHome', 'screenPlayer', 'screenChannels'].forEach(s => document.getElementById(s).classList.remove('active'));
-            ['navHome', 'navPlayer', 'navChannels'].forEach(n => document.getElementById(n).classList.remove('active'));
+            let sourceType = 'application/x-mpegURL';
+            if (ch.url.includes('.mpd')) {
+                sourceType = 'application/dash+xml';
+            }
 
-            document.getElementById(screenId).classList.add('active');
+            vjsPlayer.src({ src: streamUrl, type: sourceType });
             
-            if (screenId === 'screenHome') document.getElementById('navHome').classList.add('active');
-            if (screenId === 'screenPlayer') {
-                document.getElementById('navPlayer').classList.add('active');
-                if (index !== null) playChannel(index);
-            }
-            if (screenId === 'screenChannels') document.getElementById('navChannels').classList.add('active');
-        }
-
-        function filterChannels(q) {
-            const term = q.toLowerCase();
-            const rows = document.querySelectorAll('#fullChannelsListBox .channel-row-item');
-            rows.forEach(row => {
-                const txt = row.textContent.toLowerCase();
-                row.style.display = txt.includes(term) ? 'flex' : 'none';
+            vjsPlayer.ready(() => {
+                let playPromise = vjsPlayer.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(() => {
+                        vjsPlayer.muted(true);
+                        vjsPlayer.play();
+                    });
+                }
             });
         }
 
