@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>سديم تي في | عالمك الفضائي</title>
-    <!-- مكتبة التشغيل السريع HLS.js -->
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest/dist/hls.light.min.js"></script>
-    <!-- خط Cairo العصري -->
+    <title>سديم تي في | Video.js Native</title>
+    
+    <!-- مكتبة Video.js وإضافة DRM (EME) -->
+    <link href="https://vjs.zencdn.net/8.10.0/video-js.css" rel="stylesheet" />
+    <script src="https://vjs.zencdn.net/8.10.0/video.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/videojs-contrib-eme@5.3.0/dist/videojs-contrib-eme.min.js"></script>
+    
+    <!-- خط Cairo -->
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
@@ -31,7 +35,7 @@
             overflow: hidden;
         }
 
-        /* حاوية الجوال السينمائية */
+        /* حاوية الجوال */
         .sadeem-container {
             width: 100%;
             max-width: 480px;
@@ -45,32 +49,6 @@
             box-shadow: 0 0 50px rgba(0, 0, 0, 0.9);
         }
 
-        /* وضع الشاشة الكاملة الفعلي */
-        .sadeem-container:fullscreen {
-            max-width: 100vw !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            height: 100dvh !important;
-            border-radius: 0 !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            z-index: 99999 !important;
-            background: #000 !important;
-        }
-        .sadeem-container:-webkit-full-screen {
-            max-width: 100vw !important;
-            width: 100vw !important;
-            height: 100vh !important;
-            height: 100dvh !important;
-            border-radius: 0 !important;
-            position: fixed !important;
-            top: 0 !important;
-            left: 0 !important;
-            z-index: 99999 !important;
-            background: #000 !important;
-        }
-
         @media (min-width: 481px) {
             .sadeem-container {
                 height: 90vh;
@@ -80,7 +58,7 @@
             }
         }
 
-        /* الشريط العُلوي الثابت */
+        /* الشريط العُلوي */
         .sadeem-header {
             height: 60px;
             min-height: 60px;
@@ -94,11 +72,6 @@
             z-index: 100;
             border-bottom: 1px solid rgba(255,255,255,0.05);
             flex-shrink: 0;
-        }
-
-        .sadeem-container:fullscreen .sadeem-header,
-        .sadeem-container:-webkit-full-screen .sadeem-header {
-            display: none !important;
         }
 
         .sadeem-logo {
@@ -134,7 +107,7 @@
             display: flex;
         }
 
-        /* تصميم قسم البانر مع زر المشاهدة الثابت */
+        /* قسم البانر الرئيسي */
         .hero-banner-box {
             padding: 16px;
             flex-shrink: 0;
@@ -190,7 +163,7 @@
             background: #f1f5f9;
         }
 
-        /* حقل البحث العصري */
+        /* حقل البحث */
         .search-box-container {
             padding: 0 16px 12px;
             flex-shrink: 0;
@@ -230,7 +203,7 @@
             box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.15);
         }
 
-        /* العناوين والأقسام الأفقية */
+        /* الأقسام والقوائم */
         .section-title {
             padding: 0 16px;
             font-size: 14px;
@@ -303,179 +276,20 @@
             text-overflow: ellipsis;
         }
 
-        /* المشغل الفائق وعالي الأداء */
+        /* حاوية المشغل الأصلي لـ Video.js */
         .player-wrapper {
             width: 100%;
             height: 250px;
             background: #000;
             position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
             flex-shrink: 0;
-            transition: height 0.3s ease;
         }
 
-        .sadeem-container:fullscreen .player-wrapper,
-        .sadeem-container:-webkit-full-screen .player-wrapper {
-            width: 100vw !important;
-            height: 100vh !important;
-            height: 100dvh !important;
-            flex: 1 !important;
-            position: absolute !important;
-            top: 0 !important;
-            left: 0 !important;
-            z-index: 50 !important;
-        }
-
-        .player-wrapper video {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-        }
-
-        /* البروجرس بار الدائري */
-        .circular-loader {
-            position: absolute;
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(56, 189, 248, 0.2);
-            border-top: 4px solid #38bdf8;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            display: none;
-            z-index: 25;
-            pointer-events: none;
-        }
-
-        .player-wrapper.is-loading .circular-loader {
-            display: block;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* أزرار التحكم بالمشغل */
-        .player-controls {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(to top, rgba(7,9,14,0.95), rgba(7,9,14,0.4), transparent);
-            padding: 20px 12px 10px;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-            pointer-events: none;
-            z-index: 60;
-        }
-
-        .player-wrapper.controls-visible .player-controls {
-            opacity: 1;
-            visibility: visible;
-            pointer-events: auto;
-        }
-
-        /* شريط التقدم الخطي */
-        .seekbar-box {
-            position: relative;
-            width: 100%;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            direction: ltr !important;
-        }
-
-        .seekbar-rail {
-            position: absolute;
-            width: 100%;
-            height: 5px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 4px;
-            overflow: hidden;
-            direction: ltr !important;
-        }
-
-        .buffer-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: rgba(255, 255, 255, 0.4);
-            width: 0%;
-            border-radius: 4px;
-        }
-
-        .play-progress {
-            position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
-            background: #38bdf8;
-            width: 0%;
-            border-radius: 4px;
-        }
-
-        .seekbar-handle {
-            position: absolute;
-            left: 0%;
-            width: 11px;
-            height: 11px;
-            background: #fff;
-            border-radius: 50%;
-            transform: translateX(-50%);
-            box-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
-        }
-
-        .controls-flex {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .flex-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .c-btn {
-            background: rgba(255, 255, 255, 0.12);
-            border: none;
-            color: #fff;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            backdrop-filter: blur(6px);
-            transition: 0.2s;
-        }
-
-        .c-btn:active {
-            background: rgba(56, 189, 248, 0.5);
-            transform: scale(0.9);
-        }
-
-        .c-btn svg {
-            width: 18px;
-            height: 18px;
-            fill: currentColor;
-        }
-
-        .time-txt {
-            font-size: 11px;
-            color: #cbd5e1;
-            font-weight: 600;
-            direction: ltr;
+        .video-js {
+            width: 100% !important;
+            height: 100% !important;
+            background-color: #000 !important;
+            direction: ltr !important; /* ضمان اتجاه أزرار التحكم الافتراضية */
         }
 
         /* شريط معلومات القناة */
@@ -487,11 +301,6 @@
             align-items: center;
             gap: 12px;
             flex-shrink: 0;
-        }
-
-        .sadeem-container:fullscreen .current-info-bar,
-        .sadeem-container:-webkit-full-screen .current-info-bar {
-            display: none !important;
         }
 
         .current-info-bar img {
@@ -518,7 +327,7 @@
             border-radius: 6px;
         }
 
-        /* قوائم القنوات العمودية */
+        /* القائمة العمودية */
         .channels-list-box {
             flex: 1;
             overflow-y: auto;
@@ -526,11 +335,6 @@
             display: flex;
             flex-direction: column;
             gap: 8px;
-        }
-
-        .sadeem-container:fullscreen .channels-list-box,
-        .sadeem-container:-webkit-full-screen .channels-list-box {
-            display: none !important;
         }
 
         .channel-row-item {
@@ -585,7 +389,7 @@
             color: #e0f2fe;
         }
 
-        /* شريط التنقل السفلي الثابت */
+        /* التنقل السفلي */
         .sadeem-bottom-nav {
             position: absolute;
             bottom: 0;
@@ -601,11 +405,6 @@
             border-top: 1px solid rgba(255,255,255,0.08);
             z-index: 1000;
             flex-shrink: 0;
-        }
-
-        .sadeem-container:fullscreen .sadeem-bottom-nav,
-        .sadeem-container:-webkit-full-screen .sadeem-bottom-nav {
-            display: none !important;
         }
 
         .nav-btn {
@@ -641,16 +440,16 @@
         <!-- الشريط العلوي -->
         <div class="sadeem-header">
             <div class="sadeem-logo">
-                سديم تي في <span>برو</span>
+                سديم تي في <span>Video.js Native</span>
             </div>
         </div>
 
-        <!-- 1. الشاشة الرئيسية -->
+        <!-- 1. الرئيسية -->
         <div class="app-screen active" id="screenHome">
             <div class="hero-banner-box">
                 <div class="hero-banner">
                     <h1>آفاق البث الفضائي</h1>
-                    <p>تخطى الحدود مع قنوات عربية مختارة بعناية وسرعة فائقة.</p>
+                    <p>مشغل Video.js الرسمي مع عناصر التحكم الافتراضية ودعم كامل لـ DRM و HLS.</p>
                     <button class="sadeem-btn" onclick="navigateTo('screenPlayer', 0)">▶ ابدأ البث الآن</button>
                 </div>
             </div>
@@ -659,59 +458,31 @@
             </div>
         </div>
 
-        <!-- 2. شاشة المشغل -->
+        <!-- 2. المشغل -->
         <div class="app-screen" id="screenPlayer">
-            <div class="player-wrapper controls-visible" id="playerWrapper" onclick="togglePlayerControls()">
-                <div class="circular-loader" id="circularLoader"></div>
-                <video id="mainVideo" playsinline webkit-playsinline></video>
-                
-                <div class="player-controls" id="playerControls">
-                    <div class="seekbar-box" id="seekbarBox">
-                        <div class="seekbar-rail">
-                            <div class="buffer-progress" id="bufferProgress"></div>
-                            <div class="play-progress" id="playProgress"></div>
-                        </div>
-                        <div class="seekbar-handle" id="seekbarHandle"></div>
-                    </div>
-
-                    <div class="controls-flex">
-                        <div class="flex-group">
-                            <button class="c-btn" id="playPauseBtn" onclick="handlePlayPause(event)">
-                                <svg id="playPauseIcon" viewBox="0 0 24 24"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
-                            </button>
-                            <!-- زر الصوت مع الأيقونة الديناميكية المتغيرة -->
-                            <button class="c-btn" id="muteBtn" onclick="handleMute(event)">
-                                <svg id="muteIcon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
-                            </button>
-                            <span class="time-txt" id="timeTxt">بث مباشر</span>
-                        </div>
-                        <div class="flex-group">
-                            <button class="c-btn" id="fullscreenBtn" onclick="handleFullscreen(event)">
-                                <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+            <div class="player-wrapper">
+                <!-- عنصر Video.js مع أدوات التحكم الافتراضية تفعيل (controls: true) -->
+                <video id="mainVideo" class="video-js vjs-default-skin vjs-big-play-centered" controls playsinline webkit-playsinline></video>
             </div>
 
             <div class="current-info-bar">
                 <img id="currentLogo" src="https://via.placeholder.com/40" onerror="this.src='https://via.placeholder.com/40?text=TV'">
                 <div class="current-meta">
                     <h3 id="currentTitle">اختر قناة</h3>
-                    <span>بث عالي الأداء</span>
+                    <span>مشغل Video.js الرسمي</span>
                 </div>
             </div>
 
             <div class="channels-list-box" id="channelsListBox" style="padding-bottom: 75px;"></div>
         </div>
 
-        <!-- 3. شاشة قائمة القنوات والبحث الكاملة -->
+        <!-- 3. قائمة القنوات والبحث -->
         <div class="app-screen" id="screenChannels">
             <div style="padding: 15px 16px 5px; font-size: 15px; font-weight: 900; color: #fff;">دليل القنوات والبحث</div>
             
             <div class="search-box-container" style="padding-top: 10px;">
                 <div class="search-input-wrapper">
-                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 11.99 14 9.5 14z"/></svg>
                     <input type="text" id="searchInput" class="search-input" placeholder="ابحث عن اسم القناة..." oninput="filterChannels(this.value)">
                 </div>
             </div>
@@ -719,7 +490,7 @@
             <div class="channels-list-box" id="fullChannelsListBox" style="padding-bottom: 75px;"></div>
         </div>
 
-        <!-- شريط التنقل السفلي الفعال والثابت -->
+        <!-- التنقل السفلي -->
         <div class="sadeem-bottom-nav">
             <button class="nav-btn active" id="navHome" onclick="navigateTo('screenHome')">
                 <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
@@ -738,17 +509,6 @@
     </div>
 
     <script>
-        const video = document.getElementById('mainVideo');
-        const playerWrapper = document.getElementById('playerWrapper');
-        const circularLoader = document.getElementById('circularLoader');
-        const sadeemContainer = document.getElementById('sadeemContainer');
-        const playPauseIcon = document.getElementById('playPauseIcon');
-        const muteIcon = document.getElementById('muteIcon');
-        const playProgress = document.getElementById('playProgress');
-        const bufferProgress = document.getElementById('bufferProgress');
-        const seekbarHandle = document.getElementById('seekbarHandle');
-        const timeTxt = document.getElementById('timeTxt');
-
         const screenHome = document.getElementById('screenHome');
         const screenPlayer = document.getElementById('screenPlayer');
         const screenChannels = document.getElementById('screenChannels');
@@ -762,13 +522,11 @@
         const fullChannelsListBox = document.getElementById('fullChannelsListBox');
         const currentTitle = document.getElementById('currentTitle');
         const currentLogo = document.getElementById('currentLogo');
-        const searchInput = document.getElementById('searchInput');
 
-        let hlsInstance = null;
+        let vjsPlayer = null;
         let channelsData = [];
         let groupedData = {};
 
-        // محرك بروكسي آمن لتجاوز حظر المحتوى المختلط وقوانين CORS عند الرفع على سيرفر
         const corsProxy = "https://corsproxy.io/?";
 
         const groupTranslations = {
@@ -808,6 +566,30 @@
             return channelTranslations[originalName] || originalName;
         }
 
+        // 1. تهيئة Video.js الافتراضية كلياً
+        function initVideoJS() {
+            vjsPlayer = videojs('mainVideo', {
+                controls: true, // تفعيل واجهة وأزرار Video.js الرسمية
+                autoplay: false,
+                preload: 'auto',
+                responsive: true,
+                fluid: false,
+                html5: {
+                    vhs: { overrideNative: true },
+                    nativeAudioTracks: false,
+                    nativeVideoTracks: false
+                }
+            });
+
+            if (vjsPlayer.eme) {
+                vjsPlayer.eme();
+            }
+
+            vjsPlayer.on('error', () => {
+                console.error("Video.js Error:", vjsPlayer.error());
+            });
+        }
+
         function navigateTo(screenId, targetIndex = null) {
             [screenHome, screenPlayer, screenChannels].forEach(s => s.classList.remove('active'));
             [navHome, navPlayer, navChannels].forEach(n => n.classList.remove('active'));
@@ -820,7 +602,7 @@
                 navPlayer.classList.add('active');
                 if (targetIndex !== null && channelsData.length > 0) {
                     playChannel(targetIndex);
-                } else if (!video.src && channelsData.length > 0) {
+                } else if ((!vjsPlayer || !vjsPlayer.src()) && channelsData.length > 0) {
                     playChannel(0);
                 }
             } else if (screenId === 'screenChannels') {
@@ -851,13 +633,17 @@
                     let nameM = l.match(/,(.+)$/);
                     let logoM = l.match(/tvg-logo="([^"]+)"/);
                     let groupM = l.match(/group-title="([^"]+)"/);
-                    
+                    let licenseM = l.match(/license-url="([^"]+)"/);
+                    let keyM = l.match(/clearkey="([^"]+)"/);
+
                     let rawName = nameM ? nameM[1].trim() : "قناة فضائية";
                     item.name = translateChannelName(rawName);
                     item.logo = logoM ? logoM[1] : "https://via.placeholder.com/40?text=TV";
                     
                     let rawGroup = groupM ? groupM[1] : "منوعة";
                     item.group = translateGroup(rawGroup);
+                    item.licenseServer = licenseM ? licenseM[1] : null;
+                    item.clearKey = keyM ? keyM[1] : null;
                 } else if (l && !l.startsWith('#')) {
                     item.url = l;
                     if (item.name && item.url) {
@@ -950,21 +736,14 @@
             renderChannelsList(filtered, fullChannelsListBox);
         }
 
-        // اختيار قناة جديدة وتصفير المشغل بالكامل ومعالجة القيود عند المود المرفوع
-        function playChannel(index) {
+        // 2. دالة تشغيل القنوات وتصفير المشغل
+        async function playChannel(index) {
             const ch = channelsData[index];
-            if (!ch) return;
+            if (!ch || !vjsPlayer) return;
 
-            // 1. تصفير المشغل وإيقاف البث الحالي تماماً
-            if (hlsInstance) {
-                hlsInstance.destroy();
-                hlsInstance = null;
-            }
-            video.pause();
-            video.removeAttribute('src');
-            video.load();
+            // تصفير وإعادة تعيين المشغل
+            vjsPlayer.reset();
 
-            // 2. تحديث قائمة القنوات النشطة والواجهة
             document.querySelectorAll('.channel-row-item').forEach(el => el.classList.remove('active'));
             const activeRow = document.getElementById(`ch-row-${index}`);
             if (activeRow) {
@@ -974,199 +753,46 @@
 
             currentTitle.textContent = ch.name;
             currentLogo.src = ch.logo;
-            playerWrapper.classList.add('is-loading');
 
-            // 3. تجهيز رابط البث وتمريره عبر البروكسي إذا كان http أو يتطلب حماية CORS
             let streamUrl = ch.url;
             if (window.location.protocol === 'https:' && streamUrl.startsWith('http://')) {
                 streamUrl = corsProxy + encodeURIComponent(streamUrl);
             }
 
-            // 4. تشغيل الرابط مع إعدادات متطورة تحمي من انقطاع الصوت وحظر السيرفر
-            if (Hls.isSupported()) {
-                hlsInstance = new Hls({
-                    maxBufferLength: 4,
-                    maxMaxBufferLength: 8,
-                    liveSyncDurationCount: 1,
-                    lowLatencyMode: true,
-                    enableWorker: true,
-                    xhrSetup: function (xhr, url) {
-                        xhr.withCredentials = false;
-                    }
-                });
-                hlsInstance.loadSource(streamUrl);
-                hlsInstance.attachMedia(video);
-                
-                hlsInstance.on(Hls.Events.MANIFEST_PARSED, () => {
-                    if (hlsInstance.audioTracks && hlsInstance.audioTracks.length > 0) {
-                        hlsInstance.audioTrack = 0;
-                    }
-                    video.play().then(() => {
-                        playerWrapper.classList.remove('is-loading');
-                    }).catch(e => console.log("Autoplay restricted"));
-                    updatePlayIcon(true);
-                    resetControlsTimer();
-                });
-
-                hlsInstance.on(Hls.Events.ERROR, (evt, data) => {
-                    if (data.fatal) {
-                        if (data.type === Hls.ErrorTypes.NETWORK_ERROR) {
-                            // محاولة التعافي باستخدام رابط البروكسي في حال الفشل المباشر
-                            if (!streamUrl.includes(corsProxy)) {
-                                streamUrl = corsProxy + encodeURIComponent(ch.url);
-                                hlsInstance.loadSource(streamUrl);
-                                hlsInstance.startLoad();
-                            } else {
-                                hlsInstance.startLoad();
-                            }
-                        } else if (data.type === Hls.ErrorTypes.MEDIA_ERROR) {
-                            hlsInstance.recoverMediaError();
-                        } else {
-                            hlsInstance.destroy();
-                            playerWrapper.classList.remove('is-loading');
-                        }
-                    }
-                });
-            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                video.src = streamUrl;
-                video.play().then(() => {
-                    playerWrapper.classList.remove('is-loading');
-                });
-                updatePlayIcon(true);
-                resetControlsTimer();
+            let sourceType = 'application/x-mpegURL';
+            if (streamUrl.includes('.mpd')) {
+                sourceType = 'application/dash+xml';
             }
-        }
 
-        video.addEventListener('waiting', () => {
-            playerWrapper.classList.add('is-loading');
-        });
+            let keySystems = {};
+            if (ch.licenseServer) {
+                keySystems['com.widevine.alpha'] = ch.licenseServer;
+            }
+            if (ch.clearKey) {
+                const parts = ch.clearKey.split(':');
+                if (parts.length === 2) {
+                    keySystems['org.w3.clearkey'] = {
+                        clearkeys: { [parts[0]]: parts[1] }
+                    };
+                }
+            }
 
-        video.addEventListener('playing', () => {
-            playerWrapper.classList.remove('is-loading');
-        });
+            const srcOptions = { src: streamUrl, type: sourceType };
+            if (Object.keys(keySystems).length > 0) {
+                srcOptions.keySystems = keySystems;
+            }
 
-        video.addEventListener('timeupdate', () => {
-            if (!video.duration) return;
-            const cur = video.currentTime;
-            const dur = video.duration;
-            const pct = (cur / dur) * 100;
+            vjsPlayer.src(srcOptions);
             
-            playProgress.style.width = pct + '%';
-            seekbarHandle.style.left = pct + '%';
+            vjsPlayer.ready(() => {
+                vjsPlayer.play().catch(() => {});
+            });
+        }
 
-            let m = Math.floor(cur / 60);
-            let s = Math.floor(cur % 60);
-            timeTxt.textContent = `${m}:${s < 10 ? '0' : ''}${s}`;
+        document.addEventListener('DOMContentLoaded', () => {
+            initVideoJS();
+            fetchChannels();
         });
-
-        video.addEventListener('progress', () => {
-            if (video.buffered.length > 0 && video.duration > 0) {
-                const bufferedEnd = video.buffered.end(video.buffered.length - 1);
-                const bufPct = (bufferedEnd / video.duration) * 100;
-                bufferProgress.style.width = bufPct + '%';
-            }
-        });
-
-        function handlePlayPause(e) {
-            e.stopPropagation();
-            if (video.paused) {
-                video.play();
-                updatePlayIcon(true);
-            } else {
-                video.pause();
-                updatePlayIcon(false);
-            }
-            resetControlsTimer();
-        }
-
-        function updatePlayIcon(isPlaying) {
-            if (isPlaying) {
-                playPauseIcon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
-            } else {
-                playPauseIcon.innerHTML = '<path d="M8 5v14l11-7z"/>';
-            }
-        }
-
-        // تحكم متطور في الكتم وتغيير الأيقونة ديناميكياً
-        function handleMute(e) {
-            e.stopPropagation();
-            video.muted = !video.muted;
-            updateMuteIcon(video.muted);
-            resetControlsTimer();
-        }
-
-        function updateMuteIcon(isMuted) {
-            if (isMuted) {
-                // أيقونة كتم الصوت
-                muteIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
-            } else {
-                // أيقونة الصوت العادي
-                muteIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
-            }
-        }
-
-        function handleFullscreen(e) {
-            e.stopPropagation();
-            const isFull = document.fullscreenElement || document.webkitFullscreenElement;
-
-            if (!isFull) {
-                if (sadeemContainer.requestFullscreen) {
-                    sadeemContainer.requestFullscreen().then(() => {
-                        tryRotateLandscape();
-                    }).catch(() => {
-                        tryRotateLandscape();
-                    });
-                } else if (sadeemContainer.webkitRequestFullscreen) {
-                    sadeemContainer.webkitRequestFullscreen();
-                    tryRotateLandscape();
-                } else if (video.webkitEnterFullscreen) {
-                    video.webkitEnterFullscreen();
-                }
-            } else {
-                if (document.exitFullscreen) {
-                    document.exitFullscreen();
-                } else if (document.webkitExitFullscreen) {
-                    document.webkitExitFullscreen();
-                }
-                if (screen.orientation && screen.orientation.unlock) {
-                    screen.orientation.unlock().catch(() => {});
-                }
-            }
-            resetControlsTimer();
-        }
-
-        function tryRotateLandscape() {
-            if (screen.orientation && screen.orientation.lock) {
-                screen.orientation.lock('landscape').catch((err) => {
-                    console.log("Landscape lock not supported:", err);
-                });
-            }
-        }
-
-        let hideTimer = null;
-
-        function togglePlayerControls() {
-            if (playerWrapper.classList.contains('controls-visible')) {
-                playerWrapper.classList.remove('controls-visible');
-                clearTimeout(hideTimer);
-            } else {
-                playerWrapper.classList.add('controls-visible');
-                resetControlsTimer();
-            }
-        }
-
-        function resetControlsTimer() {
-            clearTimeout(hideTimer);
-            playerWrapper.classList.add('controls-visible');
-            
-            hideTimer = setTimeout(() => {
-                if (!video.paused) {
-                    playerWrapper.classList.remove('controls-visible');
-                }
-            }, 3000);
-        }
-
-        fetchChannels();
     </script>
 </body>
 </html>
