@@ -2,26 +2,27 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>سينما لايف | Cinema Live</title>
     
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- استخدام إصدار مستقر قديم 4.6.2 من ArtPlayer -->
+    <!-- ArtPlayer & HLS.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/artplayer@4.6.2/dist/artplayer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
     <style>
         :root {
-            --bg-main: #0c0d12;
-            --bg-card: #161821;
-            --bg-hover: #212433;
+            --bg-body: #060709;
+            --bg-card: #10121a;
+            --bg-hover: #191c28;
             --primary: #ff0055;
+            --primary-glow: rgba(ff, 0, 85, 0.35);
             --text-main: #ffffff;
-            --text-sub: #8d93a5;
-            --border: #232736;
-            --radius: 12px;
+            --text-sub: #7d8597;
+            --border: rgba(255, 255, 255, 0.07);
+            --radius: 14px;
         }
 
         * {
@@ -29,125 +30,122 @@
             margin: 0;
             padding: 0;
             font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            background-color: var(--bg-main);
+            background-color: var(--bg-body);
             color: var(--text-main);
             display: flex;
             flex-direction: column;
             min-height: 100vh;
         }
 
-        .header {
+        /* الهيدر العلوي الاحترافي */
+        .app-header {
             height: 55px;
             background: var(--bg-card);
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 15px;
+            padding: 0 18px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .logo {
+        .brand-logo {
             display: flex;
             align-items: center;
             gap: 10px;
             font-size: 18px;
-            font-weight: 800;
+            font-weight: 900;
+            letter-spacing: -0.5px;
         }
 
-        .logo i {
+        .brand-logo i {
             color: var(--primary);
-            font-size: 22px;
+            font-size: 20px;
+            filter: drop-shadow(0 0 8px var(--primary-glow));
         }
 
-        .app-container {
-            display: flex;
-            flex: 1;
-            height: calc(100vh - 55px);
-            overflow: hidden;
-        }
-
-        .player-section {
-            flex: 1;
-            background: #000;
-            display: flex;
-            flex-direction: column;
-            min-width: 0;
-        }
-
+        /* منطقة ArtPlayer المتقدمة */
         .player-wrapper {
-            flex: 1;
-            position: relative;
+            width: 100%;
             background: #000;
-            min-height: 300px;
+            position: relative;
+            aspect-ratio: 16 / 9;
+            max-height: 42vh;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
         #artplayer {
-            position: absolute;
-            top: 0;
-            left: 0;
             width: 100%;
             height: 100%;
         }
 
+        /* شريط القناة الحالية */
         .current-channel-bar {
-            height: 60px;
-            padding: 0 15px;
             background: var(--bg-card);
-            border-top: 1px solid var(--border);
+            padding: 12px 18px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            border-bottom: 1px solid var(--border);
         }
 
-        .channel-details {
+        .channel-info {
             display: flex;
             align-items: center;
             gap: 12px;
         }
 
-        .channel-details img {
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
+        .channel-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
             object-fit: cover;
-            border: 2px solid var(--primary);
             background: #000;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 10px var(--primary-glow);
         }
 
-        .channel-details h3 {
+        .channel-info h3 {
             font-size: 15px;
-            font-weight: 700;
+            font-weight: 800;
         }
 
         .live-tag {
             background: var(--primary);
             color: #fff;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 11px;
-            font-weight: bold;
-            display: inline-flex;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10px;
+            font-weight: 800;
+            display: flex;
             align-items: center;
             gap: 5px;
+            box-shadow: 0 0 12px var(--primary-glow);
         }
 
-        .sidebar {
-            width: 360px;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
+        .live-tag i {
+            font-size: 6px;
+            animation: pulse 1.5s infinite;
         }
 
-        .controls-area {
-            padding: 12px;
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        /* أدوات التصفية والبحث */
+        .controls-wrapper {
+            padding: 14px 18px 8px 18px;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            border-bottom: 1px solid var(--border);
+            gap: 12px;
         }
 
         .search-box {
@@ -156,134 +154,119 @@
 
         .search-box input {
             width: 100%;
-            padding: 10px 38px 10px 12px;
-            background: var(--bg-main);
+            padding: 10px 42px 10px 14px;
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             color: #fff;
             font-size: 13px;
+            font-weight: 600;
             outline: none;
+            transition: all 0.2s ease;
         }
 
         .search-box input:focus {
             border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
         }
 
         .search-box i {
             position: absolute;
-            right: 12px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-sub);
+            font-size: 14px;
         }
 
-        .categories-tab {
+        .categories-scroll {
             display: flex;
-            gap: 6px;
+            gap: 8px;
             overflow-x: auto;
-            padding-bottom: 4px;
             scrollbar-width: none;
+            padding-bottom: 4px;
         }
 
-        .categories-tab::-webkit-scrollbar {
+        .categories-scroll::-webkit-scrollbar {
             display: none;
         }
 
         .cat-btn {
-            background: var(--bg-main);
+            background: var(--bg-card);
             color: var(--text-sub);
             border: 1px solid var(--border);
-            padding: 6px 14px;
-            border-radius: 20px;
+            padding: 6px 16px;
+            border-radius: 25px;
             font-size: 12px;
+            font-weight: 700;
             white-space: nowrap;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .cat-btn.active {
             background: var(--primary);
             color: #fff;
             border-color: var(--primary);
+            box-shadow: 0 0 12px var(--primary-glow);
+        }
+
+        /* شبكة القنوات الكبيرة */
+        .channels-wrapper {
+            padding: 8px 18px 24px 18px;
+            flex: 1;
         }
 
         .channels-grid {
-            flex: 1;
-            overflow-y: auto;
-            padding: 12px;
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            align-content: start;
-            min-height: 200px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
         }
 
         .channel-card {
-            background: var(--bg-main);
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 10px;
+            padding: 12px 6px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
             cursor: pointer;
             text-align: center;
-            user-select: none;
+            transition: all 0.2s ease;
         }
 
-        .channel-card:hover, .channel-card.active {
+        .channel-card:active {
+            transform: scale(0.95);
+        }
+
+        .channel-card.active {
             border-color: var(--primary);
             background: var(--bg-hover);
+            box-shadow: 0 0 15px rgba(255, 0, 85, 0.15);
         }
 
         .channel-card img {
             width: 48px;
             height: 48px;
-            border-radius: 10px;
+            border-radius: 12px;
             object-fit: cover;
             background: #000;
+            border: 1px solid var(--border);
         }
 
         .channel-card span {
-            font-size: 12px;
-            font-weight: 600;
+            font-size: 11px;
+            font-weight: 700;
             color: var(--text-main);
+            width: 100%;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            width: 100%;
         }
 
-        @media (max-width: 850px) {
-            body {
-                overflow-y: auto;
-            }
-
-            .app-container {
-                flex-direction: column;
-                height: auto;
-                overflow: visible;
-            }
-
-            .player-wrapper {
-                height: 56.25vw;
-                min-height: auto;
-                flex: none;
-            }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                border-right: none;
-            }
-
-            .channels-grid {
-                grid-template-columns: repeat(3, 1fr);
-                overflow: visible;
-            }
-        }
-
-        @media (max-width: 450px) {
+        @media (max-width: 400px) {
             .channels-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -292,48 +275,46 @@
 </head>
 <body>
 
-    <header class="header">
-        <div class="logo">
+    <header class="app-header">
+        <div class="brand-logo">
             <i class="fa-solid fa-play"></i>
             <span>سينما لايف</span>
         </div>
-        <span style="font-size: 11px; color: var(--text-sub);">تلفزيون مباشر</span>
+        <span style="font-size: 11px; color: var(--text-sub); font-weight: 700;">LIVE TV</span>
     </header>
 
-    <div class="app-container">
-        <div class="player-section">
-            <div class="player-wrapper">
-                <div id="artplayer"></div>
-            </div>
-            <div class="current-channel-bar">
-                <div class="channel-details">
-                    <img id="currentLogo" src="https://i.ibb.co/mCyLhw47/image.jpg" alt="logo">
-                    <div>
-                        <h3 id="currentTitle">MBC 3 EUR</h3>
-                        <span class="live-tag"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> مباشر</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- مشغل ArtPlayer -->
+    <div class="player-wrapper" id="playerWrapper">
+        <div id="artplayer"></div>
+    </div>
 
-        <div class="sidebar">
-            <div class="controls-area">
-                <div class="search-box">
-                    <i class="fa-solid fa-search"></i>
-                    <input type="text" id="searchInput" placeholder="ابحث عن قناة..." oninput="filterChannels()">
-                </div>
-                <div class="categories-tab">
-                    <button class="cat-btn active" onclick="setCategory('all', this)">الكل</button>
-                    <button class="cat-btn" onclick="setCategory('palestine', this)">فلسطين</button>
-                    <button class="cat-btn" onclick="setCategory('news', this)">الأخبار</button>
-                    <button class="cat-btn" onclick="setCategory('kids', this)">الأطفال</button>
-                    <button class="cat-btn" onclick="setCategory('islamic', this)">إسلاميات</button>
-                    <button class="cat-btn" onclick="setCategory('general', this)">ترفيه عام</button>
-                </div>
-            </div>
-
-            <div class="channels-grid" id="channelsGrid"></div>
+    <!-- معلومات القناة -->
+    <div class="current-channel-bar">
+        <div class="channel-info">
+            <img id="currentLogo" src="https://i.ibb.co/mCyLhw47/image.jpg" alt="logo">
+            <h3 id="currentTitle">MBC 3 EUR</h3>
         </div>
+        <div class="live-tag"><i class="fa-solid fa-circle"></i> مباشر</div>
+    </div>
+
+    <!-- تصفية وقائمة القنوات -->
+    <div class="controls-wrapper">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="searchInput" placeholder="ابحث عن قناة..." oninput="renderChannels()">
+        </div>
+        <div class="categories-scroll">
+            <button class="cat-btn active" onclick="setCategory('all', this)">الكل</button>
+            <button class="cat-btn" onclick="setCategory('palestine', this)">فلسطين</button>
+            <button class="cat-btn" onclick="setCategory('news', this)">الأخبار</button>
+            <button class="cat-btn" onclick="setCategory('kids', this)">الأطفال</button>
+            <button class="cat-btn" onclick="setCategory('islamic', this)">إسلاميات</button>
+            <button class="cat-btn" onclick="setCategory('general', this)">عام</button>
+        </div>
+    </div>
+
+    <div class="channels-wrapper">
+        <div class="channels-grid" id="channelsGrid"></div>
     </div>
 
     <script>
@@ -344,7 +325,7 @@
             { name: "الحدث", cat: "news", logo: "https://i.ibb.co/Nd33d9rK/image.png", url: "https://live.alarabiya.net/alarabiapublish/alhadath.smil/playlist.m3u8" },
             { name: "قناة الأقصى", cat: "palestine", logo: "https://i.ibb.co/pvfGqbjd/image.jpg", url: "https://43869de4e1a0d641.servers.dvcloud.tv/hls/al_aqsa_channel/6udfi7v8a3eof6nlps6e9ovfrs65c7l7.m3u8" },
             { name: "الجزيرة 4K", cat: "news", logo: "https://i.ibb.co/VYyJQV52/image.jpg", url: "https://live-hls-web-aja.getaj.net/AJA/01.m3u8" },
-            { name: "إذاعة القرآن الكريم", cat: "islamic", logo: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=600&auto=format&fit=crop", url: "https://live.kwikmotion.com/sbrksaquranradiolive/srpksaquranradio/playlist.m3u8" },
+            { name: "إذاعة القرآن", cat: "islamic", logo: "https://images.unsplash.com/photo-1609599006353-e629aaabfeae?q=80&w=600&auto=format&fit=crop", url: "https://live.kwikmotion.com/sbrksaquranradiolive/srpksaquranradio/playlist.m3u8" },
             { name: "العربية", cat: "news", logo: "https://i.ibb.co/3VFfw2Z/image.jpg", url: "https://live.alarabiya.net/alarabiapublish/alarabiya.smil/playlist.m3u8" },
             { name: "التلفزيون العربي", cat: "news", logo: "https://i.ibb.co/m5gxf7jM/image.jpg", url: "https://live.kwikmotion.com/alaraby1live/alaraby_abr/playlist.m3u8" },
             { name: "الميادين", cat: "news", logo: "https://iili.io/CbBixNp.png", url: "https://mdnlv.cdn.octivid.com/almdn/smil:mpegts.stream.smil/playlist.m3u8" },
@@ -378,39 +359,11 @@
 
         let currentCat = 'all';
         let activeIndex = 0;
+        let art = null;
         let hlsInstance = null;
 
-        const art = new ArtPlayer({
-            container: '#artplayer',
-            url: channels[0].url,
-            isLive: true,
-            autoplay: true,
-            pip: true,
-            fullscreen: true,
-            fullscreenWeb: true,
-            theme: '#ff0055',
-            customType: {
-                m3u8: function (video, url) {
-                    if (hlsInstance) {
-                        hlsInstance.destroy();
-                    }
-                    if (Hls.isSupported()) {
-                        hlsInstance = new Hls({
-                            enableWorker: true,
-                            lowLatencyMode: true
-                        });
-                        hlsInstance.loadSource(url);
-                        hlsInstance.attachMedia(video);
-                    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                        video.src = url;
-                    }
-                },
-            },
-        });
-
-        const grid = document.getElementById('channelsGrid');
-
         function renderChannels() {
+            const grid = document.getElementById('channelsGrid');
             grid.innerHTML = '';
             const searchVal = document.getElementById('searchInput').value.toLowerCase();
 
@@ -432,6 +385,58 @@
             });
         }
 
+        function initArtPlayer() {
+            if (typeof ArtPlayer === 'undefined') return;
+
+            art = new ArtPlayer({
+                container: '#artplayer',
+                url: channels[0].url,
+                isLive: true,
+                autoplay: true,
+                pip: true,
+                fullscreen: true,
+                fullscreenWeb: true,
+                theme: '#ff0055',
+                icons: {
+                    state: '<i class="fa-solid fa-play" style="font-size: 30px; color: #ff0055;"></i>',
+                },
+                controls: [
+                    {
+                        position: 'right',
+                        html: '<i class="fa-solid fa-rotate" style="font-size: 16px;"></i>',
+                        tooltip: 'تدوير أفقي',
+                        click: function () {
+                            art.fullscreen = true;
+                            if (screen.orientation && screen.orientation.lock) {
+                                screen.orientation.lock('landscape').catch(() => {});
+                            }
+                        },
+                    },
+                ],
+                customType: {
+                    m3u8: function (video, url) {
+                        if (hlsInstance) hlsInstance.destroy();
+                        if (typeof Hls !== 'undefined' && Hls.isSupported()) {
+                            hlsInstance = new Hls({ enableWorker: true });
+                            hlsInstance.loadSource(url);
+                            hlsInstance.attachMedia(video);
+                        } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                            video.src = url;
+                        }
+                    },
+                },
+            });
+
+            // قفل الاتجاه أفقياً تلقائياً عند تكبير الشاشة في ArtPlayer
+            art.on('fullscreen', (state) => {
+                if (state && screen.orientation && screen.orientation.lock) {
+                    screen.orientation.lock('landscape').catch(() => {});
+                } else if (!state && screen.orientation && screen.orientation.unlock) {
+                    screen.orientation.unlock();
+                }
+            });
+        }
+
         function selectChannel(index) {
             activeIndex = index;
             const ch = channels[index];
@@ -439,12 +444,11 @@
             document.getElementById('currentTitle').innerText = ch.name;
             document.getElementById('currentLogo').src = ch.logo;
 
-            art.switchUrl(ch.url);
-            renderChannels();
-
-            if (window.innerWidth <= 850) {
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+            if (art) {
+                art.switchUrl(ch.url);
             }
+            renderChannels();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function setCategory(cat, btn) {
@@ -454,11 +458,13 @@
             renderChannels();
         }
 
-        function filterChannels() {
+        document.addEventListener('DOMContentLoaded', () => {
             renderChannels();
-        }
+            initArtPlayer();
+        });
 
         renderChannels();
+        initArtPlayer();
     </script>
 </body>
 </html>
