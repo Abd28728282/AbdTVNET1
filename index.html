@@ -5,9 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Abd TV</title>
     
-    <!-- مكتبة ArtPlayer.js مع HLS.js للبث المباشر -->
+    <!-- مكتبات التسريع ودعم كافة صيغ البث في العالم (HLS, DASH, FLV) -->
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dashjs@latest/dist/dash.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
 
     <style>
         * {
@@ -31,7 +33,7 @@
         html, body {
             width: 100%;
             height: 100%;
-            height: 100dvh; /* ارتفاع ديناميكي حقيقي يتكيف مع أشرطة المتصفح */
+            height: 100dvh;
             background-color: #C8102E;
             display: flex;
             flex-direction: column;
@@ -99,7 +101,7 @@
             height: calc(100% - 55px);
         }
 
-        /* مؤشر التحميل الدائري البسيط في منتصف الشاشة */
+        /* مؤشر التحميل الدائري البسيط الأصلي */
         .page-loader {
             position: absolute;
             top: 40%;
@@ -161,7 +163,7 @@
             text-overflow: ellipsis;
         }
 
-        /* واجهة المشغل الرئيسية دون أي اختفاء أو اقتصاص */
+        /* حاوية المشغل الرئيسي */
         #playerSection {
             display: none;
             flex-direction: column;
@@ -199,10 +201,10 @@
     <div class="content-frame">
         <div id="progressBar" class="page-loader"></div>
         
-        <!-- قائمة العناصر (القنوات والمجموعات) -->
+        <!-- قائمة العناصر -->
         <div id="listView" class="list-view"></div>
 
-        <!-- قسم المشغل الأساسي بدون أخطاء أبعاد -->
+        <!-- قسم المشغل الأساسي السريع -->
         <div id="playerSection">
             <div class="artplayer-container" id="artplayer"></div>
         </div>
@@ -223,6 +225,7 @@
         let currentCategory = null;
         let isPlayerActive = false;
         let art = null;
+        let activeHls = null;
 
         const listView = document.getElementById('listView');
         const playerSection = document.getElementById('playerSection');
@@ -232,8 +235,10 @@
         const backBtn = document.getElementById('backBtn');
         const appTitle = document.getElementById('appTitle');
 
-        // ==================== تشغيل المشغل وضبط أبعاده تلقائياً ====================
+        // ==================== تشغيل المشغل فائق السرعة لدعم جميع الصيغ ====================
         function openPlayer(url, title) {
+            closePlayer(); // تنظيف أي بث سابق لمنع استمرار الصوت والتعليق
+
             isPlayerActive = true;
             listView.style.display = 'none';
             searchBox.style.display = 'none';
@@ -242,15 +247,17 @@
             backBtn.style.display = 'block';
             appTitle.textContent = title;
 
-            if (art) {
-                art.destroy();
-            }
+            // تحديد نوع البث تلقائياً
+            let streamType = 'auto';
+            if (url.includes('.m3u8')) streamType = 'm3u8';
+            else if (url.includes('.mpd')) streamType = 'mpd';
+            else if (url.includes('.flv')) streamType = 'flv';
 
             art = new Artplayer({
                 container: '#artplayer',
                 url: url,
                 title: title,
-                type: url.includes('.m3u8') ? 'm3u8' : 'auto',
+                type: streamType,
                 autoplay: true,
                 isLive: true,
                 fullscreen: true,
@@ -261,24 +268,43 @@
                 aspectRatio: true,
                 theme: '#C8102E',
                 customType: {
+                    // 1. محرك HLS فائق السرعة وبتقليل البافر للتأخير المنخفض
                     m3u8: function (video, url) {
                         if (Hls.isSupported()) {
-                            const hls = new Hls();
+                            if (activeHls) activeHls.destroy();
+                            const hls = new Hls({
+                                maxBufferLength: 10,        // تقليل زمن التخزين لتسريع فتح البث
+                                maxMaxBufferLength: 20,
+                                enableWorker: true,         // استخدام معالج الخلفية لتسريع المعالجة
+                                lowLatencyMode: true        // تفعيل البث المباشر فائق السرعة
+                            });
                             hls.loadSource(url);
                             hls.attachMedia(video);
+                            activeHls = hls;
                         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                             video.src = url;
                         }
                     },
+                    // 2. محرك MPEG-DASH
+                    mpd: function (video, url) {
+                        const player = dashjs.MediaPlayer().create();
+                        player.initialize(video, url, true);
+                    },
+                    // 3. محرك FLV Stream
+                    flv: function (video, url) {
+                        if (flvjs.isSupported()) {
+                            const flvPlayer = flvjs.createPlayer({ type: 'flv', url: url });
+                            flvPlayer.attachMediaElement(video);
+                            flvPlayer.load();
+                            flvPlayer.play();
+                        }
+                    }
                 },
             });
 
-            // إعادة ضبط أبعاد المشغل فور فتح الشاشة لتجنب أي اقتصاص
             setTimeout(() => {
-                if (art && art.resize) {
-                    art.resize();
-                }
-            }, 100);
+                if (art && art.resize) art.resize();
+            }, 50);
 
             art.on('fullscreen', (isFull) => {
                 if (isFull) {
@@ -293,12 +319,19 @@
             });
         }
 
+        // إغلاق المشغل وتنظيف الذاكرة بالكامل لحل مشكلة استمرار الصوت أو البث في الخلفية
         function closePlayer() {
+            if (activeHls) {
+                activeHls.destroy();
+                activeHls = null;
+            }
+
             if (art) {
                 if (screen.orientation && screen.orientation.unlock) {
                     screen.orientation.unlock();
                 }
-                art.destroy();
+                art.pause();
+                art.destroy(true); // تدمير كلي شامل للمحرك
                 art = null;
             }
             
@@ -316,14 +349,12 @@
             }
         }
 
-        // إعادة ضبط الأبعاد تلقائياً إذا قام المستخدم بتعديل حجم المتصفح أو تدوير الجهاز
         window.addEventListener('resize', () => {
             if (art && isPlayerActive && art.resize) {
                 art.resize();
             }
         });
 
-        // زر العودة
         function goBack() {
             if (isPlayerActive) {
                 closePlayer();
