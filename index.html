@@ -4,7 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Abd TV</title>
-    
+
+    <!-- إعدادات التثبيت كـ PWA وتدعم أندرويد و iOS (أيفون) والأيقونة المطلوبة -->
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Abd TV">
+    <link rel="apple-touch-icon" href="https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png">
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Abd TV","short_name":"Abd TV","start_url":"./","display":"standalone","background_color":"%23C8102E","theme_color":"%23C8102E","icons":[{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"192x192","type":"image/png"},{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"512x512","type":"image/png"}]}'>
+
     <!-- مكتبات التسريع ودعم كافة صيغ البث في العالم (HLS, DASH, FLV) -->
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -200,7 +208,7 @@
 
     <div class="content-frame">
         <div id="progressBar" class="page-loader"></div>
-        
+
         <!-- قائمة العناصر -->
         <div id="listView" class="list-view"></div>
 
@@ -235,7 +243,7 @@
         const backBtn = document.getElementById('backBtn');
         const appTitle = document.getElementById('appTitle');
 
-        // ==================== تشغيل المشغل فائق السرعة لدعم جميع الصيغ ====================
+        // ==================== تشغيل المشغل فائق السرعة لدعم جميع الصيغ (تم تحسين السرعة لفتح البث فوراً) ====================
         function openPlayer(url, title) {
             closePlayer(); // تنظيف أي بث سابق لمنع استمرار الصوت والتعليق
 
@@ -243,7 +251,7 @@
             listView.style.display = 'none';
             searchBox.style.display = 'none';
             playerSection.style.display = 'flex';
-            
+
             backBtn.style.display = 'block';
             appTitle.textContent = title;
 
@@ -251,7 +259,7 @@
             let streamType = 'auto';
             if (url.includes('.m3u8')) streamType = 'm3u8';
             else if (url.includes('.mpd')) streamType = 'mpd';
-            else if (url.includes('.flv')) streamType = 'flv';
+            else if (url.includes('.flv')) streamType, streamType = 'flv';
 
             art = new Artplayer({
                 container: '#artplayer',
@@ -268,15 +276,17 @@
                 aspectRatio: true,
                 theme: '#C8102E',
                 customType: {
-                    // 1. محرك HLS فائق السرعة وبتقليل البافر للتأخير المنخفض
+                    // 1. محرك HLS فائق السرعة مع ضبط Buffer الأدنى لفتح القناة بدون أي انتظار
                     m3u8: function (video, url) {
                         if (Hls.isSupported()) {
                             if (activeHls) activeHls.destroy();
                             const hls = new Hls({
-                                maxBufferLength: 10,        // تقليل زمن التخزين لتسريع فتح البث
-                                maxMaxBufferLength: 20,
-                                enableWorker: true,         // استخدام معالج الخلفية لتسريع المعالجة
-                                lowLatencyMode: true        // تفعيل البث المباشر فائق السرعة
+                                maxBufferLength: 4,          // تقليل حجم البافر لسرعة فورية بالفتح
+                                maxMaxBufferLength: 10,
+                                enableWorker: true,           // تسريع المعالجة عبر المعالج الخلفي
+                                lowLatencyMode: true,         // تفعيل وضع البث الفوري منخفض التأخير
+                                liveSyncDurationCount: 2,     // مزامنة فورية مع البث المباشر
+                                liveMaxLatencyDurationCount: 5
                             });
                             hls.loadSource(url);
                             hls.attachMedia(video);
@@ -334,7 +344,7 @@
                 art.destroy(true); // تدمير كلي شامل للمحرك
                 art = null;
             }
-            
+
             isPlayerActive = false;
             playerSection.style.display = 'none';
             searchBox.style.display = 'flex';
