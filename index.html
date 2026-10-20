@@ -5,26 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Abd TV</title>
 
-    <!-- إعدادات التثبيت كـ PWA وتدعم أندرويد و iOS (أيفون) والأيقونة المطلوبة -->
+    <!-- إعدادات التثبيت كـ PWA ودعم iOS وAndroid بأيقونة مخصصة -->
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Abd TV">
+    <meta name="theme-color" content="#900020">
     <link rel="apple-touch-icon" href="https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png">
-    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Abd TV","short_name":"Abd TV","start_url":"./","display":"standalone","background_color":"%23C8102E","theme_color":"%23C8102E","icons":[{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"192x192","type":"image/png"},{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"512x512","type":"image/png"}]}'>
+    <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Abd TV","short_name":"Abd TV","start_url":"./","display":"standalone","background_color":"%23660012","theme_color":"%23900020","icons":[{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"192x192","type":"image/png"},{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"512x512","type":"image/png"}]}'>
 
-    <!-- مكتبات التسريع ودعم كافة صيغ البث في العالم (HLS, DASH, FLV) -->
+    <!-- مكتبات مشغل الفيديو لدعم كافة صيغ البث المباشر (HLS, DASH, FLV) -->
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <script src="https://cdn.jsdelivr.net/npm/dashjs@latest/dist/dash.all.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
 
     <style>
+        /* إعدادات العناصر والخطوط العامة */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             -webkit-tap-highlight-color: transparent !important;
             -webkit-touch-callout: none;
             user-select: none;
@@ -42,20 +44,88 @@
             width: 100%;
             height: 100%;
             height: 100dvh;
-            background-color: #C8102E;
+            background: #4a000e;
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            position: relative;
         }
 
-        /* Top Bar */
+        /* خلفية سائلة متحركة للتأثير الزجاجي Liquid Glass Background */
+        .liquid-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            overflow: hidden;
+            background: linear-gradient(135deg, #700018 0%, #30000a 50%, #900020 100%);
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.65;
+            animation: float 14s infinite ease-in-out alternate;
+        }
+
+        .blob-1 {
+            width: 280px;
+            height: 280px;
+            background: #ff2a55;
+            top: -50px;
+            right: -40px;
+            animation-duration: 12s;
+        }
+
+        .blob-2 {
+            width: 320px;
+            height: 320px;
+            background: #c8102e;
+            bottom: -80px;
+            left: -60px;
+            animation-duration: 16s;
+        }
+
+        .blob-3 {
+            width: 220px;
+            height: 220px;
+            background: #ff6b8b;
+            top: 40%;
+            left: 30%;
+            animation-duration: 10s;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
+            50% { transform: translate(30px, 40px) scale(1.1) rotate(180deg); }
+            100% { transform: translate(-20px, -30px) scale(0.95) rotate(360deg); }
+        }
+
+        /* واجهة التطبيق الزجاجية الأساسية */
+        .app-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* الشريط العلوي الزجاجي Top Bar */
         .top-bar {
-            height: 55px;
-            background-color: #C8102E;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.12);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 12px;
+            padding: 0 16px;
             color: white;
             z-index: 10;
             flex-shrink: 0;
@@ -64,21 +134,40 @@
         .header-left {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
+        /* زر العودة بالسهم متحه نحو اليمين ➡️ */
         .back-btn {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 22px;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: bold;
             cursor: pointer;
             display: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            transition: all 0.2s ease;
+        }
+
+        .back-btn:active {
+            transform: scale(0.9);
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .app-title {
-            font-size: 18px;
-            font-weight: bold;
+            font-size: 20px;
+            font-weight: 800;
+            color: #ffffff;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            letter-spacing: 0.5px;
         }
 
         .search-container {
@@ -86,42 +175,60 @@
             align-items: center;
         }
 
+        /* حقل البحث بتصميم زجاجي */
         .search-input {
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            background: rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             outline: none;
             font-size: 14px;
-            width: 150px;
-            transition: width 0.3s ease;
-            color: #333;
+            width: 140px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            color: #ffffff;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
+        .search-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .search-input:focus {
+            width: 180px;
+            background: rgba(255, 255, 255, 0.28);
+            border-color: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+        }
+
+        /* إطار المحتوى الرئيسي */
         .content-frame {
             flex: 1;
             position: relative;
-            padding: 8px 12px 12px 12px;
+            padding: 12px 14px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             width: 100%;
-            height: calc(100% - 55px);
+            height: calc(100% - 60px);
         }
 
-        /* مؤشر التحميل الدائري البسيط الأصلي */
+        /* مؤشر التحميل الزجاجي الدائري */
         .page-loader {
             position: absolute;
             top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 45px;
-            height: 45px;
-            border: 4px solid rgba(255,255,255,0.3);
-            border-top: 4px solid white;
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            border-top: 4px solid #ffffff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             display: block;
+            backdrop-filter: blur(8px);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         @keyframes spin {
@@ -129,49 +236,72 @@
             100% { transform: translate(-50%, -50%) rotate(360deg); }
         }
 
+        /* قائمة العناصر الكروت */
         .list-view {
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 10px;
             width: 100%;
         }
 
+        /* تصميم الكارت الزجاجي السائل */
         .card-item {
-            background-color: #ffffff;
-            border-radius: 10px;
-            border: 2.5px solid #900000;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(16px) saturate(180%);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.2);
             display: flex;
             align-items: center;
-            padding: 0 14px;
-            height: 52px;
+            padding: 0 16px;
+            height: 56px;
             cursor: pointer;
-            transition: background-color 0.15s ease, transform 0.1s ease;
+            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* لمعان زجاجي علوي على الكارت */
+        .card-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40%;
+            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
+            pointer-events: none;
         }
 
         .card-item:active {
-            background-color: #ececec;
-            transform: scale(0.98);
+            background: rgba(255, 255, 255, 0.28);
+            transform: scale(0.97);
+            border-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .card-img {
-            width: 30px;
-            height: 30px;
+            width: 32px;
+            height: 32px;
             object-fit: contain;
-            margin-left: 10px;
+            margin-left: 12px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .card-title {
             font-size: 16px;
-            font-weight: bold;
-            color: #900000;
+            font-weight: 700;
+            color: #ffffff;
             flex: 1;
             text-align: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
         }
 
-        /* حاوية المشغل الرئيسي */
+        /* حاوية المشغل الرئيسي بأسلوب زجاجي */
         #playerSection {
             display: none;
             flex-direction: column;
@@ -183,10 +313,12 @@
         .artplayer-container {
             width: 100%;
             height: 100%;
-            min-height: 220px;
-            border-radius: 12px;
+            min-height: 230px;
+            border-radius: 16px;
             overflow: hidden;
-            background: #000;
+            background: #000000;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
         }
     </style>
 
@@ -196,29 +328,41 @@
 </head>
 <body>
 
-    <div class="top-bar">
-        <div class="header-left">
-            <button id="backBtn" class="back-btn" onclick="goBack()">⬅</button>
-            <div id="appTitle" class="app-title">Abd TV</div>
-        </div>
-        <div class="search-container" id="searchBox">
-            <input type="text" id="searchView" class="search-input" placeholder="ابحث هنا...">
-        </div>
+    <!-- خلفية سائلة أنيقة زجاجية -->
+    <div class="liquid-bg">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
     </div>
 
-    <div class="content-frame">
-        <div id="progressBar" class="page-loader"></div>
+    <!-- واجهة التطبيق فوق الخلفية السائلة -->
+    <div class="app-container">
+        <div class="top-bar">
+            <div class="header-left">
+                <!-- زر سهم العودة متجهاً لليمين ➔ للملائمة مع الاتجاه العربي -->
+                <button id="backBtn" class="back-btn" onclick="goBack()" aria-label="رجوع">➔</button>
+                <div id="appTitle" class="app-title">Abd TV</div>
+            </div>
+            <div class="search-container" id="searchBox">
+                <input type="text" id="searchView" class="search-input" placeholder="ابحث هنا...">
+            </div>
+        </div>
 
-        <!-- قائمة العناصر -->
-        <div id="listView" class="list-view"></div>
+        <div class="content-frame">
+            <div id="progressBar" class="page-loader"></div>
 
-        <!-- قسم المشغل الأساسي السريع -->
-        <div id="playerSection">
-            <div class="artplayer-container" id="artplayer"></div>
+            <!-- قائمة العناصر والكروت -->
+            <div id="listView" class="list-view"></div>
+
+            <!-- قسم المشغل الأساسي -->
+            <div id="playerSection">
+                <div class="artplayer-container" id="artplayer"></div>
+            </div>
         </div>
     </div>
 
     <script>
+        // إعدادات قاعدة بيانات Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAXV3LcnXpWxuT6MJwh1q-i5eERjCbhrI",
             databaseURL: "https://appp-1e19d-default-rtdb.firebaseio.com",
@@ -243,23 +387,23 @@
         const backBtn = document.getElementById('backBtn');
         const appTitle = document.getElementById('appTitle');
 
-        // ==================== تشغيل المشغل فائق السرعة لدعم جميع الصيغ (تم تحسين السرعة لفتح البث فوراً) ====================
+        // ==================== تشغيل المشغل فائق السرعة لدعم جميع الصيغ ====================
         function openPlayer(url, title) {
-            closePlayer(); // تنظيف أي بث سابق لمنع استمرار الصوت والتعليق
+            closePlayer(); // تنظيف وتدمير أي مشغل سابق لمنع استمرار الصوت
 
             isPlayerActive = true;
             listView.style.display = 'none';
             searchBox.style.display = 'none';
             playerSection.style.display = 'flex';
 
-            backBtn.style.display = 'block';
+            backBtn.style.display = 'flex';
             appTitle.textContent = title;
 
-            // تحديد نوع البث تلقائياً
+            // تحديد نوع البث
             let streamType = 'auto';
             if (url.includes('.m3u8')) streamType = 'm3u8';
             else if (url.includes('.mpd')) streamType = 'mpd';
-            else if (url.includes('.flv')) streamType, streamType = 'flv';
+            else if (url.includes('.flv')) streamType = 'flv';
 
             art = new Artplayer({
                 container: '#artplayer',
@@ -274,19 +418,19 @@
                 setting: true,
                 playbackRate: true,
                 aspectRatio: true,
-                theme: '#C8102E',
+                theme: '#ff2a55',
                 customType: {
-                    // 1. محرك HLS فائق السرعة مع ضبط Buffer الأدنى لفتح القناة بدون أي انتظار
+                    // 1. محرك HLS فائق السرعة وبتقليل الـ Buffer لأقل درجة لفتح البث فوراً
                     m3u8: function (video, url) {
                         if (Hls.isSupported()) {
                             if (activeHls) activeHls.destroy();
                             const hls = new Hls({
-                                maxBufferLength: 4,          // تقليل حجم البافر لسرعة فورية بالفتح
-                                maxMaxBufferLength: 10,
-                                enableWorker: true,           // تسريع المعالجة عبر المعالج الخلفي
-                                lowLatencyMode: true,         // تفعيل وضع البث الفوري منخفض التأخير
-                                liveSyncDurationCount: 2,     // مزامنة فورية مع البث المباشر
-                                liveMaxLatencyDurationCount: 5
+                                maxBufferLength: 3,           // تقليل التخزين لمستويات فائقة لفتح البث بدون تأخير
+                                maxMaxBufferLength: 6,
+                                enableWorker: true,            // تسريع معالجة الفيديو بالخلفية
+                                lowLatencyMode: true,          // وضع البث الفوري منخفض التأخير
+                                liveSyncDurationCount: 2,      // مزامنة فورية مع البث المباشر
+                                liveMaxLatencyDurationCount: 4
                             });
                             hls.loadSource(url);
                             hls.attachMedia(video);
@@ -329,7 +473,7 @@
             });
         }
 
-        // إغلاق المشغل وتنظيف الذاكرة بالكامل لحل مشكلة استمرار الصوت أو البث في الخلفية
+        // إغلاق المشغل وتنظيف الذاكرة بالكامل ومنع استمرار الصوت
         function closePlayer() {
             if (activeHls) {
                 activeHls.destroy();
@@ -352,7 +496,7 @@
 
             if (currentCategory) {
                 appTitle.textContent = currentCategory;
-                backBtn.style.display = 'block';
+                backBtn.style.display = 'flex';
             } else {
                 appTitle.textContent = "Abd TV";
                 backBtn.style.display = 'none';
@@ -417,7 +561,7 @@
                     if (isCategory) {
                         currentCategory = parseItemName(item);
                         appTitle.textContent = currentCategory;
-                        backBtn.style.display = 'block';
+                        backBtn.style.display = 'flex';
                         filterByCategory(currentCategory);
                     } else {
                         const targetUrl = parseItemUrl(item);
