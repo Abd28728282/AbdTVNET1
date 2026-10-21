@@ -14,14 +14,12 @@
     <link rel="apple-touch-icon" href="https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png">
     <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Abd TV","short_name":"Abd TV","start_url":"./","display":"standalone","background_color":"%23660012","theme_color":"%23900020","icons":[{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"192x192","type":"image/png"},{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"512x512","type":"image/png"}]}'>
 
-    <!-- مكتبات مشغل الفيديو لدعم كافة صيغ البث المباشر (HLS, DASH, FLV) -->
+    <!-- مكتبات المشغل الأسطوري ArtPlayer مع HLS السريع وخفيف الوزن -->
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/dashjs@latest/dist/dash.all.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
 
     <style>
-        /* إعدادات العناصر والخطوط العامة */
+        /* إعدادات العناصر والخطوط العامة (مجهزة للأداء العالي والأجهزة الضعيفة) */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -44,67 +42,25 @@
             width: 100%;
             height: 100%;
             height: 100dvh;
-            background: #4a000e;
+            background: #2a0008;
             display: flex;
             flex-direction: column;
             overflow: hidden;
             position: relative;
         }
 
-        /* خلفية سائلة متحركة للتأثير الزجاجي Liquid Glass Background */
-        .liquid-bg {
+        /* خلفية بسيطة وسريعة بدون أي رسوم متحركة خفيفة جداً */
+        .simple-bg {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: 0;
-            overflow: hidden;
-            background: linear-gradient(135deg, #700018 0%, #30000a 50%, #900020 100%);
+            background: linear-gradient(180deg, #500012 0%, #200007 100%);
         }
 
-        .blob {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(60px);
-            opacity: 0.65;
-            animation: float 14s infinite ease-in-out alternate;
-        }
-
-        .blob-1 {
-            width: 280px;
-            height: 280px;
-            background: #ff2a55;
-            top: -50px;
-            right: -40px;
-            animation-duration: 12s;
-        }
-
-        .blob-2 {
-            width: 320px;
-            height: 320px;
-            background: #c8102e;
-            bottom: -80px;
-            left: -60px;
-            animation-duration: 16s;
-        }
-
-        .blob-3 {
-            width: 220px;
-            height: 220px;
-            background: #ff6b8b;
-            top: 40%;
-            left: 30%;
-            animation-duration: 10s;
-        }
-
-        @keyframes float {
-            0% { transform: translate(0, 0) scale(1) rotate(0deg); }
-            50% { transform: translate(30px, 40px) scale(1.1) rotate(180deg); }
-            100% { transform: translate(-20px, -30px) scale(0.95) rotate(360deg); }
-        }
-
-        /* واجهة التطبيق الزجاجية الأساسية */
+        /* واجهة التطبيق الأساسية */
         .app-container {
             position: relative;
             z-index: 1;
@@ -114,14 +70,12 @@
             height: 100%;
         }
 
-        /* الشريط العلوي الزجاجي Top Bar */
+        /* الشريط العلوي */
         .top-bar {
             height: 60px;
-            background: rgba(255, 255, 255, 0.12);
-            backdrop-filter: blur(20px) saturate(180%);
-            -webkit-backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.25);
+            background: #600015;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -137,12 +91,10 @@
             gap: 12px;
         }
 
-        /* زر العودة بالسهم متحه نحو اليمين ➡️ */
+        /* زر العودة بالسهم متحه نحو اليمين ➔ */
         .back-btn {
-            background: rgba(255, 255, 255, 0.18);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.25);
             color: #ffffff;
             font-size: 18px;
             font-weight: bold;
@@ -153,12 +105,10 @@
             border-radius: 50%;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            transition: all 0.2s ease;
+            transition: background 0.15s ease;
         }
 
         .back-btn:active {
-            transform: scale(0.9);
             background: rgba(255, 255, 255, 0.3);
         }
 
@@ -166,7 +116,6 @@
             font-size: 20px;
             font-weight: 800;
             color: #ffffff;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
             letter-spacing: 0.5px;
         }
 
@@ -175,31 +124,26 @@
             align-items: center;
         }
 
-        /* حقل البحث بتصميم زجاجي */
         .search-input {
             padding: 8px 16px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.35);
-            background: rgba(255, 255, 255, 0.18);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            background: rgba(0, 0, 0, 0.25);
             outline: none;
             font-size: 14px;
             width: 140px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.2s ease;
             color: #ffffff;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .search-input::placeholder {
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 255, 255, 0.6);
         }
 
         .search-input:focus {
-            width: 180px;
-            background: rgba(255, 255, 255, 0.28);
-            border-color: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 0 12px rgba(255, 255, 255, 0.2);
+            width: 170px;
+            background: rgba(0, 0, 0, 0.4);
+            border-color: rgba(255, 255, 255, 0.5);
         }
 
         /* إطار المحتوى الرئيسي */
@@ -214,21 +158,19 @@
             height: calc(100% - 60px);
         }
 
-        /* مؤشر التحميل الزجاجي الدائري */
+        /* مؤشر التحميل الدائري */
         .page-loader {
             position: absolute;
             top: 40%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.15);
+            width: 44px;
+            height: 44px;
+            border: 4px solid rgba(255, 255, 255, 0.2);
             border-top: 4px solid #ffffff;
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
             display: block;
-            backdrop-filter: blur(8px);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
         }
 
         @keyframes spin {
@@ -244,41 +186,23 @@
             width: 100%;
         }
 
-        /* تصميم الكارت الزجاجي السائل */
         .card-item {
-            background: rgba(255, 255, 255, 0.15);
-            backdrop-filter: blur(16px) saturate(180%);
-            -webkit-backdrop-filter: blur(16px) saturate(180%);
-            border-radius: 14px;
-            border: 1px solid rgba(255, 255, 255, 0.28);
-            box-shadow: 0 8px 24px 0 rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             display: flex;
             align-items: center;
             padding: 0 16px;
             height: 56px;
             cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transition: background 0.15s ease, transform 0.1s ease;
             position: relative;
             overflow: hidden;
         }
 
-        /* لمعان زجاجي علوي على الكارت */
-        .card-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 40%;
-            background: linear-gradient(180deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 100%);
-            pointer-events: none;
-        }
-
         .card-item:active {
-            background: rgba(255, 255, 255, 0.28);
-            transform: scale(0.97);
-            border-color: rgba(255, 255, 255, 0.5);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(0.98);
         }
 
         .card-img {
@@ -286,7 +210,6 @@
             height: 32px;
             object-fit: contain;
             margin-left: 12px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
         }
 
         .card-title {
@@ -298,10 +221,9 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
         }
 
-        /* حاوية المشغل الرئيسي بأسلوب زجاجي */
+        /* حاوية المشغل الرئيسي بتصميم فخم خفيف */
         #playerSection {
             display: none;
             flex-direction: column;
@@ -313,12 +235,12 @@
         .artplayer-container {
             width: 100%;
             height: 100%;
-            min-height: 230px;
-            border-radius: 16px;
+            min-height: 250px;
+            border-radius: 14px;
             overflow: hidden;
             background: #000000;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
         }
     </style>
 
@@ -328,18 +250,13 @@
 </head>
 <body>
 
-    <!-- خلفية سائلة أنيقة زجاجية -->
-    <div class="liquid-bg">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
+    <!-- خلفية بسيطة وسريعة خالية من أية مشاكل أداء -->
+    <div class="simple-bg"></div>
 
-    <!-- واجهة التطبيق فوق الخلفية السائلة -->
+    <!-- واجهة التطبيق الأساسية -->
     <div class="app-container">
         <div class="top-bar">
             <div class="header-left">
-                <!-- زر سهم العودة متجهاً لليمين ➔ للملائمة مع الاتجاه العربي -->
                 <button id="backBtn" class="back-btn" onclick="goBack()" aria-label="رجوع">➔</button>
                 <div id="appTitle" class="app-title">Abd TV</div>
             </div>
@@ -354,7 +271,7 @@
             <!-- قائمة العناصر والكروت -->
             <div id="listView" class="list-view"></div>
 
-            <!-- قسم المشغل الأساسي -->
+            <!-- قسم المشغل الأسطوري الخالي من أزرار المشاركة -->
             <div id="playerSection">
                 <div class="artplayer-container" id="artplayer"></div>
             </div>
@@ -387,9 +304,9 @@
         const backBtn = document.getElementById('backBtn');
         const appTitle = document.getElementById('appTitle');
 
-        // ==================== تشغيل المشغل فائق السرعة لدعم جميع الصيغ ====================
+        // ==================== تشغيل المشغل الأسطوري (ArtPlayer) ====================
         function openPlayer(url, title) {
-            closePlayer(); // تنظيف وتدمير أي مشغل سابق لمنع استمرار الصوت
+            closePlayer(); // تنظيف أي مشغل سابق
 
             isPlayerActive = true;
             listView.style.display = 'none';
@@ -399,38 +316,29 @@
             backBtn.style.display = 'flex';
             appTitle.textContent = title;
 
-            // تحديد نوع البث
-            let streamType = 'auto';
-            if (url.includes('.m3u8')) streamType = 'm3u8';
-            else if (url.includes('.mpd')) streamType = 'mpd';
-            else if (url.includes('.flv')) streamType = 'flv';
-
             art = new Artplayer({
                 container: '#artplayer',
                 url: url,
                 title: title,
-                type: streamType,
+                type: 'm3u8',
                 autoplay: true,
                 isLive: true,
                 fullscreen: true,
                 fullscreenWeb: true,
                 pip: true,
                 setting: true,
-                playbackRate: true,
+                playbackRate: false, // إخفاء التحكم بالسرعة للبث المباشر
                 aspectRatio: true,
-                theme: '#ff2a55',
+                theme: '#ff2a55', // لون الهوية العنابي الفخم
                 customType: {
-                    // 1. محرك HLS فائق السرعة وبتقليل الـ Buffer لأقل درجة لفتح البث فوراً
                     m3u8: function (video, url) {
                         if (Hls.isSupported()) {
                             if (activeHls) activeHls.destroy();
                             const hls = new Hls({
-                                maxBufferLength: 3,           // تقليل التخزين لمستويات فائقة لفتح البث بدون تأخير
+                                maxBufferLength: 3,
                                 maxMaxBufferLength: 6,
-                                enableWorker: true,            // تسريع معالجة الفيديو بالخلفية
-                                lowLatencyMode: true,          // وضع البث الفوري منخفض التأخير
-                                liveSyncDurationCount: 2,      // مزامنة فورية مع البث المباشر
-                                liveMaxLatencyDurationCount: 4
+                                enableWorker: true,
+                                lowLatencyMode: true
                             });
                             hls.loadSource(url);
                             hls.attachMedia(video);
@@ -438,22 +346,8 @@
                         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                             video.src = url;
                         }
-                    },
-                    // 2. محرك MPEG-DASH
-                    mpd: function (video, url) {
-                        const player = dashjs.MediaPlayer().create();
-                        player.initialize(video, url, true);
-                    },
-                    // 3. محرك FLV Stream
-                    flv: function (video, url) {
-                        if (flvjs.isSupported()) {
-                            const flvPlayer = flvjs.createPlayer({ type: 'flv', url: url });
-                            flvPlayer.attachMediaElement(video);
-                            flvPlayer.load();
-                            flvPlayer.play();
-                        }
                     }
-                },
+                }
             });
 
             setTimeout(() => {
@@ -473,7 +367,7 @@
             });
         }
 
-        // إغلاق المشغل وتنظيف الذاكرة بالكامل ومنع استمرار الصوت
+        // إغلاق المشغل وتنظيف الذاكرة بالكامل
         function closePlayer() {
             if (activeHls) {
                 activeHls.destroy();
@@ -485,7 +379,7 @@
                     screen.orientation.unlock();
                 }
                 art.pause();
-                art.destroy(true); // تدمير كلي شامل للمحرك
+                art.destroy(true);
                 art = null;
             }
 
