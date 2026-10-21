@@ -14,9 +14,11 @@
     <link rel="apple-touch-icon" href="https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png">
     <link rel="manifest" href='data:application/manifest+json;charset=utf-8,{"name":"Abd TV","short_name":"Abd TV","start_url":"./","display":"standalone","background_color":"%23660012","theme_color":"%23900020","icons":[{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"192x192","type":"image/png"},{"src":"https://i.ibb.co/fY1t1K5z/Abd-TV-2-8-apk-icon.png","sizes":"512x512","type":"image/png"}]}'>
 
-    <!-- مكتبات المشغل الأسطوري ArtPlayer مع HLS السريع وخفيف الوزن -->
+    <!-- مكتبات المشغل الأسطوري ArtPlayer مع دعم جميع الصيغ (HLS, DASH, FLV) -->
     <script src="https://cdn.jsdelivr.net/npm/artplayer/dist/artplayer.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dashjs@latest/dist/dash.all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flv.js@latest/dist/flv.min.js"></script>
 
     <style>
         /* إعدادات العناصر والخطوط العامة (مجهزة للأداء العالي والأجهزة الضعيفة) */
@@ -49,7 +51,7 @@
             position: relative;
         }
 
-        /* خلفية بسيطة وسريعة بدون أي رسوم متحركة خفيفة جداً */
+        /* خلفية بسيطة وسريعة وخفيفة جداً بدون خامات ثقيلة */
         .simple-bg {
             position: absolute;
             top: 0;
@@ -70,7 +72,7 @@
             height: 100%;
         }
 
-        /* الشريط العلوي */
+        /* الشريط العلوي Top Bar */
         .top-bar {
             height: 60px;
             background: #600015;
@@ -250,7 +252,7 @@
 </head>
 <body>
 
-    <!-- خلفية بسيطة وسريعة خالية من أية مشاكل أداء -->
+    <!-- خلفية بسيطة وسريعة جداً وخالية من أي بطء -->
     <div class="simple-bg"></div>
 
     <!-- واجهة التطبيق الأساسية -->
@@ -271,7 +273,7 @@
             <!-- قائمة العناصر والكروت -->
             <div id="listView" class="list-view"></div>
 
-            <!-- قسم المشغل الأسطوري الخالي من أزرار المشاركة -->
+            <!-- قسم المشغل الأساسي -->
             <div id="playerSection">
                 <div class="artplayer-container" id="artplayer"></div>
             </div>
@@ -295,6 +297,8 @@
         let isPlayerActive = false;
         let art = null;
         let activeHls = null;
+        let activeDash = null;
+        let activeFlv = null;
 
         const listView = document.getElementById('listView');
         const playerSection = document.getElementById('playerSection');
@@ -304,7 +308,7 @@
         const backBtn = document.getElementById('backBtn');
         const appTitle = document.getElementById('appTitle');
 
-        // ==================== تشغيل المشغل الأسطوري (ArtPlayer) ====================
+        // ==================== تشغيل المشغل ودعم جميع الصيغ ====================
         function openPlayer(url, title) {
             closePlayer(); // تنظيف أي مشغل سابق
 
@@ -316,21 +320,29 @@
             backBtn.style.display = 'flex';
             appTitle.textContent = title;
 
+            // كشف نوع الصيغة تلقائياً
+            let streamType = 'auto';
+            const cleanUrl = url.toLowerCase();
+            if (cleanUrl.includes('.m3u8')) streamType = 'm3u8';
+            else if (cleanUrl.includes('.mpd')) streamType = 'mpd';
+            else if (cleanUrl.includes('.flv')) streamType = 'flv';
+
             art = new Artplayer({
                 container: '#artplayer',
                 url: url,
                 title: title,
-                type: 'm3u8',
+                type: streamType,
                 autoplay: true,
                 isLive: true,
                 fullscreen: true,
                 fullscreenWeb: true,
                 pip: true,
                 setting: true,
-                playbackRate: false, // إخفاء التحكم بالسرعة للبث المباشر
+                playbackRate: false, // إخفاء التحكم بالسرعة في البث المباشر
                 aspectRatio: true,
-                theme: '#ff2a55', // لون الهوية العنابي الفخم
+                theme: '#ff2a55',
                 customType: {
+                    // 1. دعم HLS (.m3u8)
                     m3u8: function (video, url) {
                         if (Hls.isSupported()) {
                             if (activeHls) activeHls.destroy();
@@ -345,6 +357,24 @@
                             activeHls = hls;
                         } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                             video.src = url;
+                        }
+                    },
+                    // 2. دعم MPEG-DASH (.mpd)
+                    mpd: function (video, url) {
+                        if (activeDash) activeDash.reset();
+                        const player = dashjs.MediaPlayer().create();
+                        player.initialize(video, url, true);
+                        activeDash = player;
+                    },
+                    // 3. دعم FLV Stream (.flv)
+                    flv: function (video, url) {
+                        if (flvjs.isSupported()) {
+                            if (activeFlv) activeFlv.destroy();
+                            const flvPlayer = flvjs.createPlayer({ type: 'flv', url: url });
+                            flvPlayer.attachMediaElement(video);
+                            flvPlayer.load();
+                            flvPlayer.play();
+                            activeFlv = flvPlayer;
                         }
                     }
                 }
@@ -367,11 +397,21 @@
             });
         }
 
-        // إغلاق المشغل وتنظيف الذاكرة بالكامل
+        // إغلاق المشغل وتنظيف المحركات من الذاكرة تماماً
         function closePlayer() {
             if (activeHls) {
                 activeHls.destroy();
                 activeHls = null;
+            }
+
+            if (activeDash) {
+                activeDash.reset();
+                activeDash = null;
+            }
+
+            if (activeFlv) {
+                activeFlv.destroy();
+                activeFlv = null;
             }
 
             if (art) {
